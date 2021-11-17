@@ -27,6 +27,8 @@
             <th> Ips remisora </th>
             <th> Profesional remisor </th>
             <th> Especialidad remisor </th>
+            <th> Estado </th>
+            <th> Fecha de cancelado </th>
         </tr>
     </thead>
     <tbody>
@@ -58,6 +60,8 @@
             <td> {{ $datum->ips_remisora }} </td>
             <td> {{ $datum->professional_remisor }} </td>
             <td> {{ $datum->speciality_remisor }} </td>
+            <td> {{ $datum->state }} </td>
+            <td> {{ $datum->cancellation_at }} </td>
         </tr>
         @endforeach
     </tbody>
