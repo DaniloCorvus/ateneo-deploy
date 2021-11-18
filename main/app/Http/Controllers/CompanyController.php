@@ -28,13 +28,16 @@ class CompanyController extends Controller
      */
     public function index($typeLocation = 0)
     {
-
         $brandShowCompany = 0;
 
         $companies = Company::query();
+
         // TODO: arregla la peticion de companies
 
-        if (request()->get('owner')) $brandShowCompany = request()->get('owner');
+        if (request()->get('owner')) {
+            return response()->success($companies->where('type', true)->orderBy('short_name')->get(['short_name as text', 'id as value']));
+        };
+
         if (request()->get('owner')) {
             $companies->where('type', $brandShowCompany);
             $companies->whereIn('category', ['IPS', 'SERVICIOS']);
@@ -49,6 +52,7 @@ class CompanyController extends Controller
         if ($typeLocation &&  $typeLocation != 3) {
             $typeLocation = TypeLocation::findOrfail($typeLocation);
             return CompanyResource::collection($companies->get());
+
             // $brandShowCompany = $typeLocation->show_company_owners;
         }
 
