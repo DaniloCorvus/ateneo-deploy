@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Marcation extends Model
 {
-
     protected $fillable = [
         'type',
         'img' ,

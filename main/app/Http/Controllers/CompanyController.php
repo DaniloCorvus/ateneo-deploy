@@ -182,4 +182,12 @@ class CompanyController extends Controller
         // return CompanyResource::collection(Company::where('type', $brandShowCompany)->get());
 
     }
+
+    public function getGlobal()
+    {
+        return Company::with('payConfiguration')->with('arl')->first([
+            'id', 'arl_id', 'payment_frequency', 'name as social_reason', 'tin as document_number',
+            'transportation_assistance', 'base_salary', 'law_1607'
+        ]);
+    }
 }

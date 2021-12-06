@@ -169,7 +169,7 @@ class GlobhoService
 
         return json_encode($response->json());
     }
-    
+
     public function setStatusCancell($globoid, $code, $body)
      {
         $response = Http::withOptions(['verify' => false])->delete(
@@ -179,5 +179,5 @@ class GlobhoService
 
         return json_encode($response->json());
     }
-    
+
 }

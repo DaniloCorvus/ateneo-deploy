@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+// use App\CustomModels\Eps;
 use App\Models\Administrator;
 use App\Traits\ApiResponser;
 use Illuminate\Database\Query\Builder;
@@ -15,11 +16,11 @@ class AdministratorController extends Controller
     public function index()
     {
         try {
-            
+
               if (!is_null(request()->get('type'))) {
                 return $this->success(Eps::orderBy('name', 'DESC')->get(['name As text', 'id As value']));
                }
-            
+
             $condition = request()->get('type') ?? 1;
             $eps = Administrator::query();
             $eps->where('type', $condition);
@@ -52,7 +53,7 @@ class AdministratorController extends Controller
             return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
         }
     }
-    
+
      public function saveEps()
     {
         try {

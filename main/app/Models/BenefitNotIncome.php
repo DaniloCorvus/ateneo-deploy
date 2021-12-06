@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BenefitNotIncome extends Model
 {
+    protected $guarded = ['id'];
 
 
     public function ingreso()

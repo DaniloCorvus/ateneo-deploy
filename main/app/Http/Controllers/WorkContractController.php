@@ -156,52 +156,52 @@ class WorkContractController extends Controller
 
     public function getTrialPeriod()
     {
-        $contratoIndeDefinido = DB::table('people as p')
-            ->select(
-                'p.image',
-                'w.id',
-                'w.date_of_admission',
-                DB::raw('concat(p.first_name, " ",p.first_surname) as names'),
-                DB::raw('DATE_FORMAT(DATE_ADD(w.date_of_admission, INTERVAL 60 DAY),"%m-%d") as dates'),
-                DB::raw('TIMESTAMPDIFF(DAY, w.date_of_admission, CURDATE()) AS worked_days'),
-            )
-            ->where('wt.conclude', '=', 0)
-            ->where('p.status', '=', 'Activo')
-            ->join('work_contracts as w', function ($join) {
-                $join->on('w.person_id', '=', 'p.id')
-                    ->whereRaw('w.id IN (select MAX(a2.id) from work_contracts as a2
-            join people as u2 on u2.id = a2.person_id group by u2.id)');
-            })
-            ->join('work_contract_types as wt', function ($join) {
-                $join->on('wt.id', '=', 'w.work_contract_type_id');
-            })
-            ->havingBetween('worked_days', [40, 60]);
+        // $contratoIndeDefinido = DB::table('people as p')
+        //     ->select(
+        //         'p.image',
+        //         'w.id',
+        //         'w.date_of_admission',
+        //         DB::raw('concat(p.first_name, " ",p.first_surname) as names'),
+        //         DB::raw('DATE_FORMAT(DATE_ADD(w.date_of_admission, INTERVAL 60 DAY),"%m-%d") as dates'),
+        //         DB::raw('TIMESTAMPDIFF(DAY, w.date_of_admission, CURDATE()) AS worked_days'),
+        //     )
+        //     ->where('wt.conclude', '=', 0)
+        //     ->where('p.status', '=', 'Activo')
+        //     ->join('work_contracts as w', function ($join) {
+        //         $join->on('w.person_id', '=', 'p.id')
+        //             ->whereRaw('w.id IN (select MAX(a2.id) from work_contracts as a2
+        //     join people as u2 on u2.id = a2.person_id group by u2.id)');
+        //     })
+        //     ->join('work_contract_types as wt', function ($join) {
+        //         $join->on('wt.id', '=', 'w.work_contract_type_id');
+        //     })
+        //     ->havingBetween('worked_days', [40, 60]);
 
-        $contratoFijo = DB::table('people as p')
-            ->select(
-                'p.image',
-                'w.id',
-                'w.date_of_admission',
-                DB::raw('concat(p.first_name, " ",p.first_surname) as names'),
-                DB::raw('DATE_FORMAT(DATE_ADD(w.date_of_admission, INTERVAL 36 DAY),"%m-%d") as dates'),
-                DB::raw('TIMESTAMPDIFF(DAY, w.date_of_admission, CURDATE()) AS worked_days')
-            )
-            ->where('wt.conclude', '=', 1)
-            ->where('p.status', '=', 'Activo')
-            ->join('work_contracts as w', function ($join) {
-                $join->on('w.person_id', '=', 'p.id')
-                    ->whereRaw('w.id IN (select MAX(a2.id) from work_contracts as a2
-            join people as u2 on u2.id = a2.person_id group by u2.id)');
-            })
-            ->join('work_contract_types as wt', function ($join) {
-                $join->on('wt.id', '=', 'w.work_contract_type_id');
-            })
-            ->whereRaw('TIMESTAMPDIFF(DAY, w.date_of_admission, CURDATE()) <=TRUNCATE( (TIMESTAMPDIFF (DAY, w.date_of_admission, w.date_end) / 5),0)')
-            ->union($contratoIndeDefinido)
-            ->get();
-        return $this->success(
-            $contratoFijo
-        );
+        // $contratoFijo = DB::table('people as p')
+        //     ->select(
+        //         'p.image',
+        //         'w.id',
+        //         'w.date_of_admission',
+        //         DB::raw('concat(p.first_name, " ",p.first_surname) as names'),
+        //         DB::raw('DATE_FORMAT(DATE_ADD(w.date_of_admission, INTERVAL 36 DAY),"%m-%d") as dates'),
+        //         DB::raw('TIMESTAMPDIFF(DAY, w.date_of_admission, CURDATE()) AS worked_days')
+        //     )
+        //     ->where('wt.conclude', '=', 1)
+        //     ->where('p.status', '=', 'Activo')
+        //     ->join('work_contracts as w', function ($join) {
+        //         $join->on('w.person_id', '=', 'p.id')
+        //             ->whereRaw('w.id IN (select MAX(a2.id) from work_contracts as a2
+        //     join people as u2 on u2.id = a2.person_id group by u2.id)');
+        //     })
+        //     ->join('work_contract_types as wt', function ($join) {
+        //         $join->on('wt.id', '=', 'w.work_contract_type_id');
+        //     })
+        //     ->whereRaw('TIMESTAMPDIFF(DAY, w.date_of_admission, CURDATE()) <=TRUNCATE( (TIMESTAMPDIFF (DAY, w.date_of_admission, w.date_end) / 5),0)')
+        //     ->union($contratoIndeDefinido)
+        //     ->get();
+        // return $this->success(
+        //     $contratoFijo
+        // );
     }
     /**
      * Show the form for creating a new resource.

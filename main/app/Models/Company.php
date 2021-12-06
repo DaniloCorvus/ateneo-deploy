@@ -35,4 +35,9 @@ class Company extends Model
     {
         return $this->belongsTo(Bank::class);
     }
+
+    public function payConfiguration()
+    {
+        return $this->hasOne(PayConfigurationCompany::class);
+    }
 }

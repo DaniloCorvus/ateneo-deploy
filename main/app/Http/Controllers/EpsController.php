@@ -14,7 +14,11 @@ class EpsController extends Controller
     public function index()
     {
         try {
-            return $this->success(Eps::orderBy('name', 'DESC')->get(['name As text', 'id As value']));
+            $condition = request()->get('type') ?? 1;
+            $eps = Eps::query();
+            $eps->where('type', $condition);
+            $eps->orderBy('name', 'DESC')->get(['name As text', 'id As value']);
+            return $this->success($eps->get());
         } catch (\Throwable $th) {
             return $this->error($th->getMessage(), 400);
         }

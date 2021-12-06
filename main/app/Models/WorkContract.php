@@ -58,4 +58,10 @@ class WorkContract extends Model
     {
         return $this->belongsTo(FixedTurn::class);
     }
+
+    public function bonifications()
+    {
+        return $this->hasMany(Bonifications::class);
+    }
+
 }
