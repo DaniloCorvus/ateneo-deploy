@@ -23,6 +23,7 @@ use App\Http\Controllers\SpecialityController;
 use App\Http\Controllers\SubTypeAppointmentController;
 use App\Http\Controllers\TypeAppointmentController;
 use App\Http\Controllers\WaitingListController;
+use App\Http\Controllers\SubcategoryController;
 use App\Models\Person;
 
 use App\Models\RegimenType;
@@ -157,6 +158,22 @@ Route::group(
 		Route::resource("type-locations", "TypeLocationController");
 		Route::resource("menus", "MenuController");
 		Route::resource("fees", "FeeController");
+
+        /*
+        RUTAS SUBCATEGORIA
+        */
+
+
+        // Route::resource("subcategory", SubcategoryController::class);
+        Route::resource("subcategory", "SubcategoryController");
+
+		Route::post("subcategory-variable/{id}", "SubcategoryController@deleteVariable");
+
+
+
+        /*
+        FIN RUTAS SUBCATEGORIA
+        */
 	}
 );
 
