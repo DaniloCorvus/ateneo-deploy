@@ -172,11 +172,31 @@ Route::group(
         Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
 		Route::resource("subcategory", "SubcategoryController");
         Route::resource("category", "CategoryController");
-        
+
         Route::resource("product", "ProductController");
 
 
         Route::resource("catalogo", "CatalogoController");
+
+
+        /** Rutas inventario dotacion rrhh */
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::get('/get-selected',  [InventaryDotationController::class, 'getSelected']);
+		Route::get('/get-total-inventary',  [InventaryDotationController::class, 'getTotatInventary']);
+		Route::get('/inventary-dotation-stock-epp',  [InventaryDotationController::class, 'getInventaryEpp']);
+
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+		Route::post('/dotations-approve/{id}',  [DotationController::class, 'approve']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+		Route::get('/dotations-list-product',  [DotationController::class, 'getListProductsDotation']);
+
+		Route::get('dotations/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'download']);
+		Route::get('downloadeliveries/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'downloadeliveries']);
+
+
+		/** end*/
 
 
 
