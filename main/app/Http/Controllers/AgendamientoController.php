@@ -3,22 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agendamiento;
-use App\Http\Resources\AgendmientoResource;
-use App\Models\Appointment;
 use App\Models\Person;
-use App\Services\SpaceService;
 use App\Models\Space;
-use App\HistoryAppointment;
 use App\HistoryAgendamiento;
 use App\Holiday;
 use App\Models\TypeAppointment;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\log;
+
+use App\Http\Resources\AgendmientoResource;
+use App\Models\Appointment;
+use App\Services\SpaceService;
+use App\HistoryAppointment;
+use Carbon\CarbonImmutable;
 
 class AgendamientoController extends Controller
 {
@@ -248,18 +249,18 @@ class AgendamientoController extends Controller
                     DB::raw('
                         CASE
                             WHEN state = "Cancelado" THEN "#d9534f"
-                            WHEN status = 0 THEN "#5cb85c" 
+                            WHEN status = 0 THEN "#5cb85c"
                             WHEN status = 1 THEN "#0275d8"
-                            
+
                         END
                         AS backgroundColor
                         '),
                     DB::raw('
                         CASE
                             WHEN state = "Cancelado" THEN "Espacio Cancelado"
-                            WHEN status = 0 THEN "Espacio Agendado" 
+                            WHEN status = 0 THEN "Espacio Agendado"
                             WHEN status = 1 THEN "Espacio Disponible"
-                            
+
                         END
                         AS title
                         '),
@@ -420,18 +421,18 @@ class AgendamientoController extends Controller
                     DB::raw('
                     CASE
                         WHEN state = "Cancelado" THEN "#d9534f"
-                        WHEN status = 0 THEN "#5cb85c" 
+                        WHEN status = 0 THEN "#5cb85c"
                         WHEN status = 1 THEN "#0275d8"
-                        
+
                     END
                     AS backgroundColor
                     '),
                     DB::raw('
                     CASE
                         WHEN state = "Cancelado" THEN "Espacio Cancelado"
-                        WHEN status = 0 THEN "Espacio Agendado" 
+                        WHEN status = 0 THEN "Espacio Agendado"
                         WHEN status = 1 THEN "Espacio Disponible"
-                        
+
                     END
                     AS title
                     ')

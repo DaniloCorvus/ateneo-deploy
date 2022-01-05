@@ -10,4 +10,9 @@ class Subcategory extends Model
 
     protected $fillable = ['Nombre', 'Separable'];
 
+    public function category()
+    {
+        return $this->hasMany(Category::class, "Id_Subcategoria");
+    }
+
 }

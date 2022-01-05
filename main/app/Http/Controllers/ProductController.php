@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Traits\ApiResponser;
-use App\Models\Subcategory;
-use App\Models\SubcategoryVariable;
+use App\Models\Product;
+use App\Models\VariableProduct;
 use Illuminate\Support\Facades\DB;
 
-class SubcategoryController extends Controller
+class ProductController extends Controller
 {
     use ApiResponser;
 
@@ -19,7 +19,42 @@ class SubcategoryController extends Controller
      */
     public function index()
     {
-        //
+
+        $data = Product::select(
+                                [
+                                    DB::raw('CONCAT(Principio_Activo, " ",Presentacion, " ",Concentracion, " (",Nombre_Comercial,") ",Cantidad," ",Unidad_Medida," EMB: ", Embalaje ) as Nombre'),
+                                    'Id_Producto','Codigo_Cum',
+                                    'Codigo_Cum as Cum',
+                                    'Principio_Activo',
+                                    'Descripcion_ATC',
+                                    'Codigo_Barras',
+                                    'Id_Producto',
+                                    'Id_Categoria',
+                                    'Id_Subcategoria',
+                                    'Laboratorio_Generico as Generico',
+                                    'Laboratorio_Comercial as Comercial',
+                                    'Invima as Invima',
+                                    'Imagen as Foto',
+                                    'Nombre_Comercial as Nombre_Comercial',
+                                    'Id_Producto',
+                                    'Embalaje',
+                                    'Tipo as Tipo',
+                                    'Tipo_Catalogo',
+                                    'Estado'
+
+                                ]
+                               );
+
+        return $this->success(
+            $data->when(request()->get("tipo"), function ($q) {
+                $q->where("Tipo_Catalogo", request()->get("tipo"));
+            })
+
+        ->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
+        );
+
+
+
     }
 
     /**
@@ -41,20 +76,23 @@ class SubcategoryController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->except(["dynamic"]);
-            $subcategory = Subcategory::create($data);
-            $dynamic = request()->get("dynamic");
 
+            $data = $request->except(["dynamic"]);
+            $dynamic = request()->get("dynamic");
+            $product = Product::create($data);
+            // echo json_encode($product);
             foreach($dynamic as $d){
-				$d["subcategory_id"] = $subcategory->id;
-				SubcategoryVariable::create($d);
+				$d["product_id"] = $product->id;
+				VariableProduct::create($d);
 			}
+
             return $this->success("guardado con éxito");
+
 
         } catch (\Throwable $th) {
             return $this->error(['message' => $th->getMessage(), $th->getLine(), $th->getFile()], 400);
-        }
 
+        }
     }
 
     /**
@@ -65,44 +103,7 @@ class SubcategoryController extends Controller
      */
     public function show($id)
     {
-        return $this->success(
-			DB::table("subcategoria as s")
-				->select("s.Nombre As text","s.Id_Subcategoria As value")
-                ->join("categoria_nueva as c", "c.Id_Categoria_nueva", "s.Id_Categoria_nueva")
-				->where("s.Id_Categoria_nueva", $id)
-				->get()
-		);
-
-    }
-
-    public function getFieldEdit($idproducto=null, $idSubcategoria){
-
-        return $this->success(
-            DB::select("SELECT SV.label, SV.type, VP.valor, SV.id AS subcategory_variables_id,  VP.id
-            FROM subcategoria S
-            INNER JOIN subcategory_variables SV  ON S.Id_Subcategoria = SV.subcategory_id
-            LEFT JOIN variable_products VP ON VP.product_id = $idproducto and VP.subcategory_variables_id = SV.id
-            where S.Id_Subcategoria = $idSubcategoria")
-        );
-
-        // return $this->success(
-        //     DB::select("SELECT SV.label, SV.type, VP.valor, S.Id_Subcategoria
-        //     FROM subcategoria S
-        //     INNER JOIN subcategory_variables SV  ON S.Id_Subcategoria = SV.subcategory_id
-        //     LEFT JOIN variable_products VP ON VP.product_id = $idproducto and VP.subcategory_variables_id = SV.id
-        //     where S.Id_Subcategoria = $idSubcategoria")
-        // );
-    }
-
-    public function getField($id)
-    {
-        return $this->success(
-			DB::table("subcategory_variables as sv")
-				->select("sv.label","sv.type","sv.id")
-                ->join("subcategoria as s", "s.Id_Subcategoria", "sv.subcategory_id")
-				->where("sv.subcategory_id", $id)
-				->get()
-		);
+        //
     }
 
     /**
@@ -127,25 +128,19 @@ class SubcategoryController extends Controller
     {
         try {
             $data = $request->except(["dynamic"]);
-            Subcategory::where('Id_Subcategoria', $id)->update($data);
             $dynamic = request()->get("dynamic");
+            $product = Product::where('Id_Producto', $id)->update($data);
 
             foreach($dynamic as $d){
-				$d["subcategory_id"] = $id;
-				SubcategoryVariable::updateOrCreate([ 'id'=> $d["id"] ], $d );
+                $d['product_id'] = $id;
+			    VariableProduct::updateOrCreate(['id' => $d["id"]], $d);
 			}
+
             return $this->success("guardado con éxito");
 
         } catch (\Throwable $th) {
             return $this->error(['message' => $th->getMessage(), $th->getLine(), $th->getFile()], 400);
         }
-
-    }
-
-    public function deleteVariable($id){
-
-        SubcategoryVariable::where("id", $id)->delete();
-
     }
 
     /**

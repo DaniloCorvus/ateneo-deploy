@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CaracterizacionController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CupController;
 use App\Http\Controllers\DataInit\PersonController as DataInitPersonController;
@@ -159,21 +160,26 @@ Route::group(
 		Route::resource("menus", "MenuController");
 		Route::resource("fees", "FeeController");
 
-        /*
-        RUTAS SUBCATEGORIA
-        */
 
-
-        // Route::resource("subcategory", SubcategoryController::class);
+        //se ejecuta al crear
         Route::resource("subcategory", "SubcategoryController");
-
 		Route::post("subcategory-variable/{id}", "SubcategoryController@deleteVariable");
 
+        //se ejecuta al crear
+        Route::get("subcategory-field/{id}", "SubcategoryController@getField");
+
+        //se ejecuta al editar
+        Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
+		Route::resource("subcategory", "SubcategoryController");
+        Route::resource("category", "CategoryController");
+        
+        Route::resource("product", "ProductController");
 
 
-        /*
-        FIN RUTAS SUBCATEGORIA
-        */
+        Route::resource("catalogo", "CatalogoController");
+
+
+
 	}
 );
 
