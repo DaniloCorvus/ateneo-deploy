@@ -57,6 +57,10 @@ class Product extends Model
         'Estado',
         'Estado_DIAN_Covid19',
         'Id_Subcategoria',
+        'Tipo_Catalogo',
+        'Orden_Compra',
+        'Producto_Dotation_Type_Id',
+        'Producto_Dotacion_Tipo',
         'CantUnMinDis'
     ];
 }

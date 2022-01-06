@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Traits\ApiResponser;
+use App\Models\ProductDotationType;
+
 
 class DotationController extends Controller
 {
+    use ApiResponser;
+
     /**
      * Display a listing of the resource.
      *
@@ -14,6 +19,14 @@ class DotationController extends Controller
     public function index()
     {
         //
+    }
+
+    public function getDotationType()
+    {
+
+        return $this->success(
+            ProductDotationType::orderBy('id', 'ASC')->get(['name As text', 'id As value'])
+        );
     }
 
     /**

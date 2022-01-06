@@ -10,9 +10,10 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CupController;
 use App\Http\Controllers\DataInit\PersonController as DataInitPersonController;
+use App\Http\Controllers\DotationController;
 use App\Http\Controllers\DurationController;
 use App\Http\Controllers\FormularioController;
-
+use App\Http\Controllers\InventaryDotationController;
 use App\Http\Controllers\OtherController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\LocationController;
@@ -188,6 +189,9 @@ Route::group(
 		Route::get('/inventary-dotation-stock-epp',  [InventaryDotationController::class, 'getInventaryEpp']);
 
 		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+
+		Route::get('/dotations-type',  [DotationController::class, 'getDotationType']);
+
 		Route::post('/dotations-approve/{id}',  [DotationController::class, 'approve']);
 		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
 		Route::get('/dotations-list-product',  [DotationController::class, 'getListProductsDotation']);

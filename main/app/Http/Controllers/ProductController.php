@@ -20,30 +20,28 @@ class ProductController extends Controller
     public function index()
     {
 
-        $data = Product::select(
-                                [
-                                    DB::raw('CONCAT(Principio_Activo, " ",Presentacion, " ",Concentracion, " (",Nombre_Comercial,") ",Cantidad," ",Unidad_Medida," EMB: ", Embalaje ) as Nombre'),
-                                    'Id_Producto','Codigo_Cum',
-                                    'Codigo_Cum as Cum',
-                                    'Principio_Activo',
-                                    'Descripcion_ATC',
-                                    'Codigo_Barras',
-                                    'Id_Producto',
-                                    'Id_Categoria',
-                                    'Id_Subcategoria',
-                                    'Laboratorio_Generico as Generico',
-                                    'Laboratorio_Comercial as Comercial',
-                                    'Invima as Invima',
-                                    'Imagen as Foto',
-                                    'Nombre_Comercial as Nombre_Comercial',
-                                    'Id_Producto',
-                                    'Embalaje',
-                                    'Tipo as Tipo',
-                                    'Tipo_Catalogo',
-                                    'Estado'
-
-                                ]
-                               );
+    $data = Product::select([
+                                DB::raw('CONCAT(Principio_Activo, " ",Presentacion, " ",Concentracion, " (",Nombre_Comercial,") ",Cantidad," ",Unidad_Medida," EMB: ", Embalaje ) as Nombre'),
+                                'Id_Producto','Codigo_Cum',
+                                'Codigo_Cum as Cum',
+                                'Principio_Activo',
+                                'Descripcion_ATC',
+                                'Codigo_Barras',
+                                'Id_Producto',
+                                'Id_Categoria',
+                                'Id_Subcategoria',
+                                'Laboratorio_Generico as Generico',
+                                'Laboratorio_Comercial as Comercial',
+                                'Invima as Invima',
+                                'Imagen as Foto',
+                                'Nombre_Comercial as Nombre_Comercial',
+                                'Id_Producto',
+                                'Embalaje',
+                                'Tipo as Tipo',
+                                'Producto_Dotacion_Tipo',
+                                'Tipo_Catalogo',
+                                'Estado'
+                            ]);
 
         return $this->success(
             $data->when(request()->get("tipo"), function ($q) {
