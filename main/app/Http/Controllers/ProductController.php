@@ -20,7 +20,8 @@ class ProductController extends Controller
     public function index()
     {
 
-    $data = Product::select([
+    $data = DB::table('producto')
+    ->select([
                                 DB::raw('CONCAT(Principio_Activo, " ",Presentacion, " ",Concentracion, " (",Nombre_Comercial,") ",Cantidad," ",Unidad_Medida," EMB: ", Embalaje ) as Nombre'),
                                 'Id_Producto','Codigo_Cum',
                                 'Codigo_Cum as Cum',
@@ -39,9 +40,14 @@ class ProductController extends Controller
                                 'Embalaje',
                                 'Tipo as Tipo',
                                 'Producto_Dotacion_Tipo',
+                                'Producto_Dotation_Type_Id',
                                 'Tipo_Catalogo',
+                                'pdt.name as nombreDotacionTipo',
                                 'Estado'
-                            ]);
+                            ])
+
+
+            ->leftJoin('product_dotation_types as pdt', 'pdt.id', '=', 'producto.Producto_Dotation_Type_Id');
 
         return $this->success(
             $data->when(request()->get("tipo"), function ($q) {
