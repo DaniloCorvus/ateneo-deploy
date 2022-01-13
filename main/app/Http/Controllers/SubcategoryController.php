@@ -82,7 +82,7 @@ class SubcategoryController extends Controller
             FROM subcategoria S
             INNER JOIN subcategory_variables SV  ON S.Id_Subcategoria = SV.subcategory_id
             LEFT JOIN variable_products VP ON VP.product_id = $idproducto and VP.subcategory_variables_id = SV.id
-            where S.Id_Subcategoria = $idSubcategoria")
+            WHERE S.Id_Subcategoria = $idSubcategoria")
         );
 
         // return $this->success(

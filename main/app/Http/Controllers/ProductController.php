@@ -133,6 +133,7 @@ class ProductController extends Controller
         try {
             $data = $request->except(["dynamic"]);
             $dynamic = request()->get("dynamic");
+           // var_dump($dynamic);
             $product = Product::where('Id_Producto', $id)->update($data);
 
             foreach($dynamic as $d){
