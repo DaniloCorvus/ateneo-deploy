@@ -62,6 +62,14 @@ class DotationController extends Controller
         //
     }
 
+    public function getDotationType()
+    {
+
+        return $this->success(
+            ProductDotationType::orderBy('id', 'ASC')->get(['name As text', 'id As value'])
+        );
+    }
+
     /**
      * Store a newly created resource in storage.
      *
