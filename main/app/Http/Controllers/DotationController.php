@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dotation;
 use App\Models\DotationProduct;
 use App\Models\InventaryDotation;
+use App\Models\ProductDotationType;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
