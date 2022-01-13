@@ -19,6 +19,7 @@ class PacienteController extends Controller
 
     public function DetallePaciente()
     {
+        
         $paciente = Paciente::where('Identificacion', request()->get('Identificacion'))->first();
 
         if (!$paciente) {

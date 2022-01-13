@@ -2,87 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Administrator;
 use App\Models\Eps;
 use App\Traits\ApiResponser;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 
 class EpsController extends Controller
 {
     use ApiResponser;
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        return $this->success(Administrator::get(['name As text', 'id As value']));
+        try {
+            $condition = request()->get('type') ?? 1;
+            $eps = Eps::query();
+            $eps->where('type', $condition);
+            $eps->orderBy('name', 'DESC')->get(['name As text', 'id As value']);
+            return $this->success($eps->get());
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage(), 400);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function paginate()
     {
-        //
+        try {
+            return $this->success(
+                Eps::orderBy('name')->when(request()->get('name'), function (Builder $q) {
+                    $q->where('name', 'like', '%' . request()->get('name') . '%');
+                })->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
+            );
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store()
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Eps  $eps
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Eps $eps)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Eps  $eps
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Eps $eps)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Eps  $eps
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Eps $eps)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Eps  $eps
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Eps $eps)
-    {
-        //
+        try {
+            $Eps = Eps::updateOrCreate(['id' => request()->get('id')], request()->all());
+            return ($Eps->wasRecentlyCreated === true) ? $this->success('creado con exito') : $this->success('Actualizado con exito');
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
     }
 }

@@ -28,9 +28,9 @@ class Globho
 
 
 		$this->body = [
-			"id" => 0,
-			"startDate" => Carbon::parse($space->hour_start)->format('Y-m-d H:i'),
-			"endDate" => Carbon::parse($space->hour_end)->format('Y-m-d H:i'),
+			"id" => 655145,
+			"startDate" => Carbon::parse($appointment->space->hour_start)->format('Y-m-d H:i'),
+			"endDate" => Carbon::parse($appointment->space->hour_end)->format('Y-m-d H:i'),
 			"state" => "Asignado",
 			"type" => ($appointment->space->agendamiento->typeAppointment->description == 'TELEMEDICINA') ? 4 : 1,
 			"text" => $appointment->observation,
@@ -38,16 +38,16 @@ class Globho
 			"appointmentId" => $appointment->code,
 			"TelehealdthUrl" => $appointment->link,
 			"patient" => [
-				"id" => $data['patient']['identifier'],
+				"id" => $appointment->callin->patient->identifier,
 				"identificationType" => $typeDocument->code,
-				"firstName" => $data['patient']['firstname'],
-				"secondName" =>  $data['patient']['middlename'],
-				"firstlastName" => $data['patient']['surname'],
-				"secondlastName" => $data['patient']['secondsurname'],
-				"email" => $data['patient']['email'],
-				"phone" => $data['patient']['phone'],
-				"birthDate" => $data['patient']['date_of_birth'],
-				"gender" =>  $data['patient']['gener'],
+				"firstName" => $appointment->callin->patient->firstname,
+				"secondName" => $appointment->callin->patient->middlename,
+				"firstlastName" => $appointment->callin->patient->surname,
+				"secondlastName" => $appointment->callin->patient->secondsurname,
+				"email" => $appointment->callin->patient->email,
+				"phone" => $appointment->callin->patient->phone,
+				"birthDate" => $appointment->callin->patient->date_of_birth,
+				"gender" => $appointment->callin->patient->gener,
 				"codeRegime" => $regimenType->code,
 				"categoryRegime" => $level->code,
 				"codeCity" => substr($municipality->code, 2, 5),
@@ -59,11 +59,11 @@ class Globho
 				'recomendations' => $cup->recomendation
 			],
 			'doctor' => [
-				'id' =>  $space->person->identifier,
-				'name' => $space->person->full_name,
+				'id' =>  $appointment->space->person->identifier,
+				'name' => $appointment->space->person->full_name,
 				'company' => [
-					'id' =>  ($space->person->company) ? $space->person->company->tin : '',
-					'name' =>  ($space->person->company) ? $space->person->company->name : ''
+					'id' => ($appointment->space->person->company) ? $appointment->space->person->company->tin : '',
+					'name' => ($appointment->space->person->company) ? $appointment->space->person->company->name : ''
 				],
 			],
 			'agreement' => [

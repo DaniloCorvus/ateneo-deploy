@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\person;
+use App\Models\Person;
 
 class PersonObserver
 {
@@ -12,7 +12,7 @@ class PersonObserver
      * @param  \App\person  $person
      * @return void
      */
-    public function created(person $person)
+    public function created(Person $person)
     {
        $person->color = concat('#',SUBSTRING((lpad(hex(round(Rand() * 10000000)),6,0)),-6));
        $person->save();

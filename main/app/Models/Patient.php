@@ -96,6 +96,7 @@ class Patient extends Model
         'type_document_id',
         'regimen_id',
         'contract_id',
+        'optional_phone'
     ];
 
     public function eps()

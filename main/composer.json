@@ -3,13 +3,14 @@
     "type": "project",
     "description": "The Laravel Framework.",
     "keywords": [
-        "framework", 
+        "framework",
         "laravel"
     ],
     "license": "MIT",
     "require": {
         "php": "^7.2.5|^8.0",
         "alexusmai/laravel-file-manager": "^2.5",
+        "barryvdh/laravel-dompdf": "^0.9.0",
         "doctrine/dbal": "2.*",
         "fabpot/goutte": "^4.0",
         "fideloper/proxy": "^4.4",
@@ -53,7 +54,9 @@
             "app/helpers/handlerTableCreate.php",
             "app/helpers/normalize.php",
             "app/helpers/globals.php",
-            "app/helpers/transformDates.php"
+            "app/helpers/transformDates.php",
+            "app/helpers/UppercaseHelper.php",
+            "app/helpers/image.php"
         ],
         "classmap": [
             "database/seeds",

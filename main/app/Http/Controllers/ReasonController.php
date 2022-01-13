@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Reason;
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 
 class ReasonController extends Controller
 {
+    use ApiResponser;
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +17,10 @@ class ReasonController extends Controller
      */
     public function index()
     {
-        //
+        return $this->success(
+            Reason::orderBy('observation', 'DESC')
+                ->get(['observation As name', 'id As value'])
+        );
     }
 
     /**

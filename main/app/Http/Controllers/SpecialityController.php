@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\SpecialityResource;
+use App\Models\Cup;
 use App\Models\Speciality;
+use App\Traits\ApiResponser;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class SpecialityController extends Controller
 {
+
+    use ApiResponser;
+
     /**
      * Display a listing of the resource.
      *
@@ -15,9 +21,28 @@ class SpecialityController extends Controller
      */
     public function index($sede = 0)
     {
-        return SpecialityResource::collection(Speciality::orderBy('name', 'ASC')->get(['id', 'name']));
-        // return SpecialityResource::collection(Speciality::where('sede_id', $sede)->get(['id', 'name']));
+        return SpecialityResource::collection(Speciality::sortedByName()->get(['id', 'name']));
     }
+
+
+    public function paginate()
+    {
+        try {
+            return $this->success(
+                Speciality::sortedByName()
+                    ->when(request()->get('name'), function (Builder $q) {
+                        $q->where('name', 'like', '%' . request()->get('name') . '%');
+                    })
+                    ->when(request()->get('code'), function (Builder $q) {
+                        $q->where('id', 'like', '%' . request()->get('code') . '%');
+                    })
+                    ->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
+            );
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -37,7 +62,12 @@ class SpecialityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $Speciality = Speciality::updateOrCreate(['id' => request()->get('id')],  toUpper(request()->all()));
+            return ($Speciality->wasRecentlyCreated === true) ? response()->success('creado con exito') : response()->success('Actualizado con exito');
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
     }
 
     /**
@@ -48,7 +78,7 @@ class SpecialityController extends Controller
      */
     public function show(Speciality $speciality)
     {
-        //
+        return response()->success($speciality);
     }
 
     /**
@@ -71,7 +101,13 @@ class SpecialityController extends Controller
      */
     public function update(Request $request, Speciality $speciality)
     {
-        //
+        try {
+            $speciality->status =  request()->get('status');
+            $speciality->save();
+            return  response()->success('Actualizado con exito');
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
     }
 
     /**
@@ -83,5 +119,10 @@ class SpecialityController extends Controller
     public function destroy(Speciality $speciality)
     {
         //
+    }
+
+    public function byProcedure($procedure = 0)
+    {
+        return Cup::find($procedure)->specialities()->get(['specialities.id as value', 'specialities.name as text']);
     }
 }

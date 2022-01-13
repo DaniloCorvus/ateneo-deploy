@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers;
 
+// use App\CustomModels\Patient;
+
+use App\Models\Patient;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Usuario;
 use App\Response;
+use App\Traits\ApiResponser;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
-
 class AuthController extends Controller
 {
+
+    use ApiResponser;
     /**
      * Login usuario y retornar el token
      * @return token
@@ -21,42 +27,38 @@ class AuthController extends Controller
     {
     }
 
+    public function index()
+    {
+        // implement users on line
+    }
+
+    public function paginate()
+    {
+    }
+
     public function login(Request $request)
     {
-        // return response()->json(request()->all());
-        $credentials = $request->only('user', 'password');
-        /*  return Response(Hash::check($credentials['password'],"$2y$10$5Mm/ZpAJ69CkmIpnDfheGeoggw2uSuf0FZyb0YiirBI3v16DEnTz6")); */
-        $data['usuario'] = $credentials['user'];
-        $data['password'] = $credentials['password'];
+        try {
+            $credentials = $request->only('user', 'password');
+            $data['usuario'] = $credentials['user'];
+            $data['password'] = $credentials['password'];
+            if (!$token = JWTAuth::attempt([
+                'usuario' => $data['usuario'],
+                'password' => $data['password']
+            ])) {
+                return response()->json(['error' => 'Unauthoriz55ed'], 401);
+            }
 
-
-
-        # return response()->json(Auth::attempt(['usuario' => '1127943747', 'password' => '12345']));
-
-
-        if (!$token = JWTAuth::attempt([
-            'usuario' => $data['usuario'],
-            'password' => $data['password']
-        ])) {
-            return response()->json(['error' => 'Unauthoriz55ed'], 401);
+            return response()->json(['status' => 'success', 'token' => $this->respondWithToken($token)], 200)->header('Authorization', $token)
+                ->withCookie(
+                    'token',
+                    $token,
+                    config('jwt.ttl'),
+                    '/'
+                );
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
         }
-        /*   return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60
-        ]); */
-
-        /*  $user = Usuario::find(auth()->user()->id);
- */
-
-        /*   return response()->json(['status' => 'success', 'token' => $this->respondWithToken($token), 'user' => $user], 200)->header('Authorization', $token) */
-        return response()->json(['status' => 'success', 'token' => $this->respondWithToken($token)], 200)->header('Authorization', $token)
-            ->withCookie(
-                'token',
-                $token,
-                config('jwt.ttl'),
-                '/'
-            );
     }
 
     public function register()
@@ -116,7 +118,9 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(auth()->user());
+        return response()->json(
+            Patient::firstWhere('identifier',  auth()->user()->usuario)
+        );
     }
 
     public function refresh()

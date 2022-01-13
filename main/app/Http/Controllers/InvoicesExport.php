@@ -27,9 +27,14 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class InvoicesExport implements FromView, WithEvents, ShouldAutoSize
+class InvoicesExport implements FromView, WithEvents, ShouldAutoSize, WithChunkReading
 {
+    
+     use Exportable;
+     
     public function __construct($data)
     {
         $this->data = $data;
@@ -37,9 +42,16 @@ class InvoicesExport implements FromView, WithEvents, ShouldAutoSize
 
     public function view(): View
     {
+        
+         
         return view('exports.' . $this->data['type'], [
             'data' => $this->data['data']
         ]);
+    }
+    
+        public function chunkSize(): int
+    {
+        return 500;
     }
 
     public function registerEvents(): array
@@ -52,3 +64,5 @@ class InvoicesExport implements FromView, WithEvents, ShouldAutoSize
         ];
     }
 }
+
+             

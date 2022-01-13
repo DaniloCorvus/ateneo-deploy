@@ -18,10 +18,12 @@ use App\Models\TypeAppointment;
 use App\Models\TypeDocument;
 use App\Models\WaitingList;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 use GeoIp2\Database\Reader;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -309,10 +311,11 @@ class TestController extends Controller
 
     public function uploadMassive()
     {
+        dd('cxvx');
 
         // foreach (DB::table('appointments')->whereNull('on_globo')->orderBy('id', 'Desc' )->get() as $temp) {
 
-        $appointment = Appointment::with('space', 'callin')->find(44547);
+        $appointment = Appointment::with('space', 'callin')->find(69279);
         // $appointment = Appointment::with('space', 'callin')->find($temp->id);
         if ($appointment->space && $appointment->callin->patient) {
 
@@ -367,8 +370,12 @@ class TestController extends Controller
                             'recomendations' => $cup->recomendation
                         ],
                         'doctor' => [
-                            'id' =>  $appointment->space->person->identifier,
-                            'name' => $appointment->space->person->full_name
+                        'id' =>  $this->space->person->id,
+                        'name' => $this->space->person->full_name,
+                        'company' => [
+                        'id' => ($this->space->person->company) ? $this->space->person->company->tin : '',
+                        'name' => ($this->space->person->company) ? $this->space->person->company->name : ''
+                        ],
                         ],
                         'agreement' => [
                             'id' => $contract->number,
@@ -378,8 +385,7 @@ class TestController extends Controller
                             'id' => $location->globo_id,
                             'name' => $location->name
                         ],
-
-                    ];
+                                            ];
 
                     $response = Http::post(
                         'https://mogarsalud.globho.com/api/integration/appointment' . "?api_key=$company->code",
@@ -398,6 +404,7 @@ class TestController extends Controller
                 }
             }
 
+
             echo 'No company ' . $appointment->id;
         } else {
 
@@ -412,8 +419,209 @@ class TestController extends Controller
 
     public function test()
     {
-        Log::info('message');
-        // $data =  Space::with('person', 'person.company')->findOrfail(41);
-        // dd([$data->person->company->tin, $data->person->company->name]);
+       try {
+
+         repeat:
+
+
+       // $ids = ['85665','85666','85667','85669','85670','85671','85672','85673','85674','85719','85720','85721','85722','85723','85724','85725','85726','85728','85741','85742','85743','85744','85745','85746','85747','85748','85749','85778','85779','85780','85781','85782','85783','85784','85785','85786','85830','85831','85832','85833','85834','85835','85836','85837','85838','85885','85886','85887','85888','85889','85890','85891','85892','85893','85902','85903','85904','85905','85906','85907','85908','85909','85910','85936','85937','85938','85939','85940','85941','85942','85943','85944'];
+
+        //foreach ($ids as $temp) {
+        // foreach (DB::table('appointments')->whereNull('on_globo')->orderBy('id', 'Desc' )->get() as $temp) {
+
+        //foreach ($ids as $temp) {
+
+         $appointment = Appointment::with('space', 'callin')->find(151226);
+
+        //$appointment = Appointment::with('space', 'callin')->find($temp);
+        // $appointment = Appointment::with('space', 'callin')->find($temp->id);
+
+        if ($appointment->space && $appointment->callin->patient) {
+
+            $cup = Cup::find($appointment->procedure);
+
+            if(!$cup){
+                dd($appointment);
+            }
+
+            $location = Location::find($appointment->callin->patient->location_id);
+            $contract = Contract::find($appointment->callin->patient->contract_id);
+            $typeDocument =    TypeDocument::find($appointment->callin->patient->type_document_id);
+            $regimenType =    RegimenType::find($appointment->callin->patient->regimen_id);
+            $level = Level::find($appointment->callin->patient->level_id);
+            $municipality = Municipality::find($appointment->callin->patient->municipality_id);
+            $department = Department::find($appointment->callin->patient->department_id);
+            $company = Company::find($appointment->callin->patient->company_id);
+
+            if ($company) {
+
+                $appointment->code = $company->simbol . date("ymd", strtotime($appointment->space->hour_start)) . str_pad($appointment->id, 7, "0", STR_PAD_LEFT);
+                $appointment->link = 'https://meet.jit.si/' . $company->simbol . date("ymd", strtotime($appointment->space->hour_start)) . str_pad($appointment->id, 7, "0", STR_PAD_LEFT);
+                $appointment->save();
+
+                if (gettype($level) == 'object' &&     gettype($regimenType) == 'object' && gettype($location) == 'object' && gettype($contract) == 'object') {
+
+                    $body = [
+                        "id" => 752494,
+                        "startDate" => Carbon::parse($appointment->space->hour_start)->format('Y-m-d H:i'),
+                        "endDate" => Carbon::parse($appointment->space->hour_end)->format('Y-m-d H:i'),
+                        "state" => 'Confirmado',
+                        "type" => ($appointment->space->agendamiento->typeAppointment->description == 'TELEMEDICINA') ? 4 : 1,
+                        "text" => $appointment->observation,
+                        "TelehealdthUrl" => 'https://meet.jit.si/' . $company->simbol . date("ymd", strtotime($appointment->space->hour_start)) . str_pad($appointment->id, 7, "0", STR_PAD_LEFT),
+                        "ConfirmationUrl" => "",
+                        "appointmentId" => $appointment->code,
+                        "patient" => [
+                            "id" => $appointment->callin->patient->identifier,
+                            "identificationType" => $typeDocument->code,
+                            "firstName" => $appointment->callin->patient->firstname,
+                            "secondName" =>  $appointment->callin->patient->middlename,
+                            "firstlastName" => $appointment->callin->patient->surname,
+                            "secondlastName" => $appointment->callin->patient->secondsurname,
+                            "email" => $appointment->callin->patient->email,
+                            "phone" => $appointment->callin->patient->phone,
+                            "birthDate" => $appointment->callin->patient->date_of_birth,
+                            "gender" =>  $appointment->callin->patient->gener,
+                            "codeRegime" => $regimenType->code,
+                            "categoryRegime" => $level->code,
+                            "codeCity" => substr($municipality->code, 2, 5),
+                            "codeState" => $department->code,
+                        ],
+
+                        'service' => [
+                            'id' => $cup->code,
+                            'name' => $cup->description,
+                            'recomendations' => $cup->recomendation
+                        ],
+                        'doctor' => [
+                        'id' =>  $appointment->space->person->identifier,
+                        'name' => $appointment->space->person->full_name,
+                        'company' => [
+                        'id' => ($appointment->space->person->company) ? $appointment->space->person->company->tin : '',
+                        'name' => ($appointment->space->person->company) ? $appointment->space->person->company->name : ''
+                        ],
+                        ],
+                        'agreement' => [
+                            'id' => $contract->number,
+                            'name' => $contract->name
+                        ],
+                        'location' => [
+                            'id' => $location->globo_id,
+                            'name' => $location->name
+                        ],
+                                            ];
+                                            //   dd($body);
+                                            //  dd($appointment->globo_id );
+
+
+                                            // $response = Http::withOptions([
+                                            //     'debug' => true,
+                                            // ])->get('https://google.com');
+
+                    $response = Http::withOptions([
+                                                'verify' => false,
+                                            ])
+                        ->put(
+                        'http://mogarsalud.globho.com/api/integration/appointment/752494'. "?api_key=$company->code",
+                        // 'https://mogarsalud.globho.com/api/integration/appointment' . "?api_key=$company->code",
+                        $body
+                    );
+
+                    if ($response->ok()) {
+                        $appointment->on_globo = 1;
+                        $appointment->globo_id =  $response->json()['id'];
+                        $appointment->save();
+                        echo  "Migrado..." . json_encode($response->json());
+                    } else {
+                        echo  "No Migrado..." . json_encode($response->json());
+                    }
+
+                    echo '<br>' .'doctor'. $appointment->space->person->full_name . 'paciente' . $appointment->callin->patient->identifier ;
+                }
+            }
+            else{
+                echo 'Sin company  ' .  $appointment->id .'doctor'. $appointment->space->person->full_name . 'paciente' . $appointment->callin->patient->identifier ;
+            }
+
+        } else {
+
+            echo 'Sin spaces  ' .  $appointment->id ;
+        }
+
+        echo ("=============================<br>");
+
+        }
+
+      //}
+
+       catch(Exception $e){
+           echo ("=============================<br>");
+           echo $e->getMessage();
+           goto repeat;
+       }
+    }
+
+    function getAppointmentByPatient() {
+
+        $identifier = request()->get('identifier');
+
+        $data = DB::select("SELECT spaces.hour_start as 'Hora inicio',  Concat_ws(' ', people.first_name, people.first_surname, ' ', people.id ) As Doctor,
+
+                        Concat_ws(' ', patients.firstname, patients.surname , ' ', patients.identifier ) As Paciente,
+
+                        specialities.name as 'Especialidad',
+
+
+                        appointments.created_at as 'Creada en',
+
+                        cups.description as 'Servicio-Cup',
+
+
+                        appointments.globo_id as 'Globho id',
+
+
+                        spaces.id as 'SpaceID',
+
+                        appointments.id as 'AppoinmentID',
+
+                        appointments.state as 'Estado',
+
+                        companies.name as 'Company del doctor',
+
+                        cp.name as 'Company del Paciente',
+
+                        agendamientos.id as 'Agendamiento'
+
+                        FROM `appointments`
+
+                        INNER JOIN spaces on spaces.id = appointments.space_id
+
+                        INNER JOIN cups on cups.id = appointments.procedure
+
+                        INNER JOIN agendamientos on agendamientos.id = spaces.agendamiento_id
+
+                        INNER JOIN specialities on specialities.id = agendamientos.speciality_id
+
+                        INNER JOIN people on people.id = agendamientos.person_id
+
+                        INNER JOIN companies  on companies.id = people.company_id
+
+                        INNER JOIN call_ins on call_ins.id = appointments.call_id
+
+                        INNER JOIN patients on patients.identifier = call_ins.Identificacion_Paciente
+
+                        INNER JOIN companies as cp on cp.id = patients.company_id
+
+                        WHERE patients.identifier IN ($identifier)
+
+                        ORDER BY `appointments`.`observation` ASC");
+
+                        return response()->json($data);
+
+    }
+
+    public function getPass()
+    {
+        return Hash::make('1000130469');
     }
 }

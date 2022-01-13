@@ -12,4 +12,9 @@ class Cup extends Model
         'speciality',
         'nickname',
     ];
+
+    public function specialities()
+    {
+        return $this->belongsToMany(Speciality::class);
+    }
 }

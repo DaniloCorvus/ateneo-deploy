@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Fee;
+use App\Models\Appointment;
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 
 class FeeController extends Controller
 {
+    use ApiResponser;
     /**
      * Display a listing of the resource.
      *
@@ -36,22 +39,41 @@ class FeeController extends Controller
 
     public function store(Request $request)
     {
+
         try {
-            $fee = Fee::create(request()->all());
-            // $fee = Fee::create([
-            //     "appointment_id" => request()->get('appointment_id'),
-            //     "payment_method_id"  => request()->get('appointment_id'),
-            //     "bank_id" => request()->get('appointment_id'),
-            //     "agenda" => request()->get('appointment_id'),
-            //     "contract_id"  => request()->get('appointment_id'),
-            //     "price"  => request()->get('appointment_id'),
-            //     "reason"  => request()->get('appointment_id'),
-            //     "observation"  => request()->get('appointment_id'),
-            //     "quantity" => request()->get('appointment_id')
-            // ]);
-            return response()->success(['message' => 'recurso creado correctamente', 'body' => $fee], 201);
+
+            switch (request()->get('cuota')) {
+                case 0:
+                    $fee = Fee::create([
+                        "appointment_id" => request()->get('appointment_id'),
+                        "price"  => request()->get('cuota'),
+                        "reason"  => request()->get('causal'),
+                        "observation"  => request()->get('observaciones'),
+                    ]);
+                    break;
+
+                default:
+                    $fee = Fee::create([
+                        "appointment_id" => request()->get('appointment_id'),
+                        "payment_method_id"  => request()->get('method_pay'),
+                        "bank_id" => request()->get('bank', 0),
+                        "price"  => request()->get('cuota'),
+                        "reason"  => request()->get('causal'),
+                        "observation"  => request()->get('observaciones'),
+                    ]);
+                    break;
+            }
+
+            if ($fee) {
+                $ap = Appointment::findOrfail(request()->get('appointment_id'));
+                $ap->state = 'SalaEspera';
+                $ap->payed = 0;
+                $ap->save();
+            }
+
+            return response()->success('recurso creado correctamente', 201);
         } catch (\Throwable $th) {
-            return response()->success([$th->getMessage(), $th->getLine(), $th->getFile()], 400);
+            return response()->error([$th->getMessage(), $th->getLine(), $th->getFile()], 400);
         }
     }
 

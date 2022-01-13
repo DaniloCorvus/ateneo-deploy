@@ -14,7 +14,9 @@ class Space extends Model
         'long',
         'person_id',
         'backgroundColor',
-        'className'
+        'className',
+        'share',
+        'type'
     ];
 
     public function agendamiento()

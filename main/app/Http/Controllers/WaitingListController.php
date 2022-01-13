@@ -20,10 +20,7 @@ class WaitingListController extends Controller
      */
     public function index()
     {
-        //
-        $data = WaitingListService::index();
-
-        return Response()->json($data);
+        return $this->success(WaitingListService::index());
     }
 
     /**
@@ -112,12 +109,14 @@ class WaitingListController extends Controller
     public function cancellWaitingAppointment()
     {
         return $this->success(
+
             WaitingList::whereId(request()->get('id'))->update(
                 [
                     'state' => 'Cancelado',
-                    'message_cancell' => request()->get('message')
+                    'message_cancell' => request()->get('message', 'sin mensaje')
                 ]
             )
+
         );
     }
 }

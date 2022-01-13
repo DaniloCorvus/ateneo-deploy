@@ -45,16 +45,31 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => public_path('app'),
         ],
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'root' => public_path('app/public'),
+            // 'url' =>   public_path('app/public'),
+            'url' => env('APP_URL') . 'app/public',
+            // 'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
 
+        'descargos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/descargos'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public'
+        ],
+        'curriculum' => [
+            'driver' => 'local',
+            'root' => storage_path('app/curriculum'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public'
+        ],
+        
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

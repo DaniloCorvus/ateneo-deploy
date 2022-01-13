@@ -9,6 +9,12 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Usuario extends Authenticatable implements JWTSubject
 {
+
+    // 'person_id' => $person->id,
+    // 'usuario' => $person->identifier,
+    // 'password' => Hash::make($person->identifier),
+    // 'change_password' => 1,
+
     use Notifiable;
 
     /**
@@ -18,7 +24,7 @@ class Usuario extends Authenticatable implements JWTSubject
      */
     protected $table = 'usuario';
     protected $fillable = [
-        'nombres', 'apellidos', 'identificacion', 'usuario', 'password', 'functionary_id',
+        'nombres', 'apellidos', 'identificacion', 'usuario', 'password', 'functionary_id', 'person_id',
     ];
 
     /**

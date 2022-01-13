@@ -157,6 +157,9 @@ class MedimasService
             case 'IPS a la que pertenece:':
                 self::$dataformat['ips_principal'] = $data['Valor'];
                 break;
+            case 'Tipo de afiliado:':
+                self::$dataformat['affiliate_type'] = $data['Valor'];
+                break;
             default:
                 break;
         }

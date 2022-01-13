@@ -24,17 +24,17 @@ class ProfessionalRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'identifier' => 'required|numeric|unique:people',
+            // 'identifier' => 'required|numeric|unique:people',
             // 'external_id' => 'required|unique:people',
-            'first_name' => 'required|string',
-            'second_name' => 'string',
-            'first_surname' => 'required|string',
-            'second_surname' => 'string',
-            'cellphone' => 'required|string',
-            'email' => 'required|email',
-            'address' => 'required|string',
-            'people_type_id' => 'required|numeric',
-            'status' => 'required|string',
+            // 'first_name' => 'required|string',
+            // 'second_name' => 'string',
+            // 'first_surname' => 'required|string',
+            // 'second_surname' => 'string',
+            // 'cellphone' => 'required|string',
+            // 'email' => 'required|email',
+            // 'address' => 'required|string',
+            // 'people_type_id' => 'required|numeric',
+            // 'status' => 'required|string',
         ];
 
         if (in_array($this->method(), ['PUT', 'PATCH'])) {

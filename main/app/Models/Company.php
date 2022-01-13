@@ -25,4 +25,23 @@ class Company extends Model
     {
         return   $this->hasMany(Location::class);
     }
+
+    public function arl()
+    {
+        return $this->belongsTo(Arl::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
+    }
+
+    public function payConfiguration()
+    {
+        return $this->hasOne(PayConfigurationCompany::class);
+    }
+    public function Configuration()
+    {
+        return $this->hasOne(Configuration::class);
+    }
 }

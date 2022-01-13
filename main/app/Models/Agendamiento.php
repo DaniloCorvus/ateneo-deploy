@@ -25,7 +25,12 @@ class Agendamiento extends Model
         'hour_end',
         'days',
         'pending',
+        'share',
+        'type',
+        'regional_percent',
+        'department_id'
     ];
+
     protected $casts = [
         'days' => 'array',
     ];

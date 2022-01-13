@@ -37,4 +37,9 @@ class ConfirmPasswordController extends Controller
     {
         $this->middleware('auth');
     }
+
+    public function paginate()
+    {
+        // implement users on line 
+    }
 }

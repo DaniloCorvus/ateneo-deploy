@@ -61,7 +61,13 @@ class Product extends Model
         'Orden_Compra',
         'Producto_Dotation_Type_Id',
         'Producto_Dotacion_Tipo',
+<<<<<<< HEAD
         'CantUnMinDis'
+=======
+        'CantUnMinDis',
+        'Id_Tipo_Activo_Fijo',
+        'Orden_Compra'
+>>>>>>> cad4ec93f5b5bac9371b86520ae0a632e88ced6e
     ];
 }
 

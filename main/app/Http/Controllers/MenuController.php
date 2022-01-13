@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+// use App\Models\Menu;
+
 use App\Menu;
 use App\Models\Usuario;
 use App\Traits\ApiResponser;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,57 +46,25 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
-        // ->where('usuario_id', $customUser->id)->get()->first()
 
-        // $customUser = Usuario::Find($request->get('usuario_id'));
-        // $menuPermission = DB::table('menu_permission_usuario')->select('*')->where('usuario_id', $customUser->id)->get()->first();
+        try {
 
+            self::$user = Usuario::where('person_id', $request->get('person_id'))->first();
+            $this->getAllPermissions($request->get('filteredMenu'));
+            $this->clearPermissions();
+            $this->insertNewPermissions();
+            self::$user->menu = $request->get('filteredMenu');
+            self::$user->save();
 
-        // dd($menuPermission);
-        // $menu = Menu::find($menuPermission->id)->with('permissions');
-        // dd($menu);
-
-        // $menuItems = $request->get('menu_ids');
-        // self::$user = Usuario::Find($request->get('usuario_id'));
-
-        // $this->loopMenu($menuItems);
-        // $this->saveJsonMenu();
-
-    }
-
-    /**
-     * Store a newly menu on user.
-     *
-     * @param  \App\Models\User  
-     * @return boolean
-     */
-
-    public function saveJsonMenu()
-    {
-
-        foreach (self::$mymenu as $permissions) {
-            foreach ($permissions['permissions'] as $item) {
-                $item['brand']  = true;
-            }
+            return $this->success('Actualización exitosa');
+        } catch (\Throwable $th) {
+            return $this->error([$th->getMessage(), $th->getLine()], 400);
         }
 
-        self::$user->menu =  self::$mymenu;
-        return self::$user->save();
+
+        return Response(self::$permissionSelectedPlain);
     }
 
-    /**
-     * loop for validate permissions.
-     *
-     * @param $menuitems, $mypermissions, $user
-     * @return void
-     */
-    public function loopMenu($menuItems)
-    {
-        foreach ($menuItems as $index => $permissions) {
-            $datamenu =   Menu::FindCustom($index);
-            $this->appendValidatePermisions($datamenu->permissions()->get()->toArray(), $permissions);
-        }
-    }
 
     /**
      * validate ermissions.
@@ -102,48 +73,8 @@ class MenuController extends Controller
      * @return void
      */
 
-    public function appendValidatePermisions($datamenu, $permissions)
-    {
-        foreach ($datamenu as  $item) {
-            foreach ($permissions as  $permission) {
-                if ($item['id'] === $permission) {
-                    $menuPermission = DB::table('menu_permission')->where('menu_id', $item['pivot']['menu_id'])->where('permission_id', $item['pivot']['permission_id'])->get()->first();
-                    if ($menuPermission) {
-                        array_push(
-                            self::$mymenu,
-                            Menu::with(['permissions' => function ($q) use ($item) {
-                                $q->where('permission_id', $item['pivot']['permission_id']);
-                            }])->whereHas('permissions', function ($q) use ($item) {
-                                $q->where('permission_id', $item['pivot']['permission_id']);
-                            })->find($item['pivot']['menu_id'])
-                        );
-                        DB::insert('insert into menu_permission_usuario (menu_permission_id, usuario_id) values (?, ?)', [$menuPermission->id, self::$user->id]);
-                    }
-                }
-            }
-        }
-    }
-
-    public function storePermissions()
-    {
-        try {
-            //code...
-            self::$user = Usuario::where('person_id', Request()->get('person_id'))->first();
-            $this->getAllPermissions(Request()->get('filteredMenu'));
-            $this->clearPermissions();
-            $this->insertNewPermissions();
-            self::$user->menu = Request()->get('filteredMenu');
-            self::$user->save();
-
-            return $this->success('Actualización exitosa');
-        } catch (\Throwable $th) {
-            //throw $th;
-            return $this->error($th->getMessage().$th->getLine(), 400);
-        }
 
 
-        return Response(self::$permissionSelectedPlain);
-    }
     static private $permissionSelectedPlain = [];
 
     private function  getAllPermissions($menu)
@@ -160,19 +91,6 @@ class MenuController extends Controller
         };
     }
 
-    /*
-     *  public extractData(menu: any) {
-            for (let element of menu) {
-              if (element.child) {
-                this.extractData(element.child)
-              }
-              if (element.link) {
-                this.temporalMenues.push(element)
-              }
-            };
-          }
-     * 
-     */
     private function clearPermissions()
     {
         DB::table('menu_permission_usuario')->where('usuario_id', '=',  self::$user->id)->delete();
@@ -192,17 +110,7 @@ class MenuController extends Controller
     }
 
 
-    // /**
-    //  * get permissions.
-    //  *
-    //  * @param $user
-    //  * @return array
-    //  */
 
-    // public function getMyPermissions($user = 1)
-    // {
-    //     DB::insert('insert into menu_permission_usuario (menu_permission_id, usuario_id) values (?, ?)', [$menuPermission->id, self::$user->id]);
-    // }
 
     /**
      * Display the specified resource.
@@ -253,79 +161,60 @@ class MenuController extends Controller
      */
     public function getByPerson()
     {
-        
-        self::$user = Usuario::where('person_id', Request()->get('person_id'))->first();
-           
-        /*   return response(self::$user); */
-        $menus = Menu::whereNull('parent_id')->get(['id', 'name']);
-        foreach ($menus as &$item) {
+        try {
 
-            $item['child'] = [];
-            if (!$item->link) $item['child'] =  $this->getChilds($item);
+            self::$user = Usuario::where('person_id', Request()->get('person_id'))->first();
+            if (!self::$user) throw new Exception("No existe un usuario asociado", 400);
+            $menus = Menu::whereNull('parent_id')->get(['id', 'name']);
+
+            foreach ($menus as &$item) {
+                $item['child'] = [];
+                if (!$item->link) $item['child'] =  $this->getChilds($item);
+            }
+            return response()->json($menus);
+        } catch (\Throwable $th) {
+            return response()->error($th->getMessage());
         }
-        return response()->json($menus);
     }
 
     private function getChilds($item)
     {
-         
-        try{
-            $menus = DB::table('menus AS M')
-                ->select(
-                    'M.*'
-                )
-                ->where('M.parent_id', $item->id)
-                ->get();
-    
-            foreach ($menus as &$itemChild) {
-                $itemChild->child = [];
-                $itemChild->child =  $this->getChilds($itemChild);
-            }
-            if ($item->link) {
-                $query = DB::table('menu_permission AS MP')
-                    ->select(
-                        'MP.menu_id',
-                        'MP.permission_id',
-                        'MP.id as menu_permission_id',
-                        'P.name',
-                        'P.public_name',
-                        'P.description',
-                        DB::raw('if(MPU.id,TRUE,FALSE) AS Activo')
-                    )
-                    ->leftJoin('menu_permission_usuario AS MPU', function ($join) {
-                        $join->on('MPU.menu_permission_id', 'MP.id')
-                            ->where('MPU.usuario_id', self::$user->id);
-                    })
-                    ->Join('permissions AS P', 'P.id', 'MP.permission_id')
-                    ->where('MP.menu_id', $item->id)
-                    ->get();
-    
-                $item->permissions = $query;
-            }
-    
-            return $menus;
-            
-        }catch(\Throwable $th){
-             return $this->error([$th->getMessage(),  $th->getFile() , $th->getLine()], 400);
+        $menus = DB::table('menus AS M')
+            ->select(
+                'M.*'
+            )
+            ->where('M.parent_id', $item->id)
+            ->get();
+
+        foreach ($menus as &$itemChild) {
+            $itemChild->child = [];
+            $itemChild->child =  $this->getChilds($itemChild);
         }
+        if ($item->link) {
+            $query = DB::table('menu_permission AS MP')
+                ->select(
+                    'MP.menu_id',
+                    'MP.permission_id',
+                    'MP.id as menu_permission_id',
+                    'P.name',
+                    'P.public_name',
+                    'P.description',
+                    DB::raw('if(MPU.id,TRUE,FALSE) AS Activo')
+                )
+                ->leftJoin('menu_permission_usuario AS MPU', function ($join) {
+                    $join->on('MPU.menu_permission_id', 'MP.id')
+                        ->where('MPU.usuario_id', self::$user->id);
+                })
+                ->Join('permissions AS P', 'P.id', 'MP.permission_id')
+                ->where('MP.menu_id', $item->id)
+                ->get();
+
+            $item->permissions = $query;
+        }
+
+        return $menus;
     }
 
-    /*   $query = DB::table('menu_permission AS MP')
-    ->select( 
-    'MP.menu_id', 
-    'MP.permission_id',
-    DB::raw('if(MPU.id,TRUE,FALSE) AS Activo') 
-     )
-    ->leftJoin('menu_permission_usuario AS MPU', function ($join) {
-        $join->on('MPU.menu_permission_id', 'MP.id')
-            ->where('MPU.usuario_id', 1);
-    }) 
-    ->Join('menus AS M', 'M.id', 'MP.menu_id')
-     ->Join('permissions AS P', 'P.id', 'MP.permission_id') 
-     ->where('MP.menu_id', $item->id) 
-    ->where('M.parent_id', $item->id) 
-    ->get();
-dd($query); */
 
     /**
      * Update the specified resource in storage.
@@ -354,8 +243,4 @@ dd($query); */
     {
         //
     }
-
-    // self::$mymenu = $datamenu->filter(function ($value) use ($item) {
-    //     return $value->id === $item['id'];
-    // });
 }

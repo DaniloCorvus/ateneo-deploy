@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class RegimenType extends Model
 {
-    // use HasFactory;
+    //
 }

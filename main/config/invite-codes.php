@@ -29,7 +29,7 @@ return [
     |
     */
     'tables' => [
-        'invites_table' => 'invites',
+        // 'invites_table' => 'invites',
     ],
 
     /*

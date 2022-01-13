@@ -13,6 +13,8 @@ use App\Models\Space;
 use App\Services\CupService;
 use App\Models\Speciality;
 use App\Traits\ApiResponser;
+use Dotenv\Result\Success;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -47,18 +49,45 @@ class CupController extends Controller
             $q->where('speciality', request()->get('speciality'))->get();
         });
 
+        $cups->when(request()->get('year'), function ($q) {
+            $q->where('year', request()->get('year'))->get();
+        });
+
         $cups->when(request()->get('space'), function ($q, $spaceId) {
             $space = Space::with('agendamiento.cups:id')->find($spaceId);
+            $cupIds = DB::table('cup_speciality')->select('cup_id')->where('speciality_id', $space->agendamiento->speciality_id);
             $q->where(function ($q) {
                 $q->where('description', 'Like', '%' . request()->get('search') . '%')
                     ->orWhere('code', 'Like', '%' . request()->get('search') . '%');
-            })->whereIn('id', $space->agendamiento->cups->pluck('id'));
+            })
+                ->where(function ($q) use ($space, $cupIds) {
+                    $q->whereIn('id', $space->agendamiento->cups->pluck('id'))
+                        ->orWhereIn('id', $cupIds->pluck('cup_id'));
+                });
         });
 
 
 
-        return $this->success($cups->get(['id as value',  DB::raw("CONCAT( code, ' - ' ,description) as text")])->take(10));
+        return $this->success($cups->get(['id as value',  DB::raw("CONCAT( code, ' - ' ,description) as text")])->take(30));
     }
+
+    public function paginate()
+    {
+        try {
+            return $this->success(
+                Cup::orderBy('description')
+                    ->when(request()->get('description'), function (Builder $q) {
+                        $q->where('description', 'like', '%' . request()->get('description') . '%');
+                    })
+                    ->when(request()->get('code'), function (Builder $q) {
+                        $q->where('code', 'like', '%' . request()->get('code') . '%');
+                    })->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
+            );
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -67,7 +96,6 @@ class CupController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -76,9 +104,15 @@ class CupController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
-        //
+        try {
+            $Cup = Cup::updateOrCreate(['id' => request()->get('id')], request()->all());
+            $Cup->specialities()->sync(request()->get('specialities'));
+            return ($Cup->wasRecentlyCreated === true) ? response()->success('creado con exito') : response()->success('Actualizado con exito');
+        } catch (\Throwable $th) {
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+        }
     }
 
     /**
@@ -87,9 +121,9 @@ class CupController extends Controller
      * @param  \App\Cup  $cup
      * @return \Illuminate\Http\Response
      */
-    public function show(Cup $cup)
+    public function show($cup)
     {
-        //
+        return response()->success(Cup::with('specialities:id')->find($cup));
     }
 
     /**

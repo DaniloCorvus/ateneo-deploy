@@ -38,6 +38,7 @@ use App\HistoryAppointment;
 use App\HistoryAgendamiento;
 use App\Models\TypeAppointment;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -49,10 +50,38 @@ use App\Models\TypeAppointment;
 |
 */
 
+
+
 Route::get('/test', 'TestController@test');
 
+Route::get('/get-info', 'TestController@getAppointmentByPatient');
+
+//Log::info('test');
 
 Route::get('/clear-cache', function () {
+    
+    
+     $people = DB::table('people')->get();
+  
+          foreach($people as $person ){
+              
+            if (!file_exists('../DOCUMENTOS/' . $person->id)) {
+				mkdir('../DOCUMENTOS/' . $person->id, 0777, true);
+                echo $person->id;
+                echo '<br>';
+                echo $person->first_name;
+			}
+
+            
+            
+          }
+  
+
+  
+  
+  dd('finalizado');
+  
+  
 
   $exitCode = Artisan::call('config:clear');
 
@@ -66,6 +95,7 @@ Route::get('/clear-cache', function () {
 
 Auth::routes();
 
+Route::get('insert-contracts', function ($id) {});
 
 Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
@@ -94,6 +124,5 @@ Route::get('/create-cups', 'CupController@storeFromMedical');
 // agreements
 Route::get('/create-cups', 'CupController@storeFromMedical');
 Route::get('/create-agreements',  [AgreementController::class, 'store']);
-Route::get('{any}', function () {
-  return view('home');
-})->where('any', '.*');
+
+Route::view('{any}', 'home')->where('any', '.*');

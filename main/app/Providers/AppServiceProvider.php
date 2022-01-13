@@ -2,9 +2,14 @@
 
 namespace App\Providers;
 
+use App\Builder\RelationsBuilder;
+use App\Mixins\CollectionMixin;
+use App\Mixins\ResponseMixin;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Http\Response as Status;
+use Illuminate\Support\Str;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,22 +30,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Response::macro('success', function ($data, $code = Status::HTTP_OK) {
-            return Response::json([
-                'status' => true,
-                'code' => $code,
-                'data' => $data,
-                'err' => null
-            ])->header('Content-Type', 'application/json');
-        });
-
-        Response::macro('error', function ($message, $code = 400) {
-            return Response::json([
-                'status' => false,
-                'code' =>  $code,
-                'data' =>  null,
-                'err' => $message
-            ])->header('Content-Type', 'application/json');
-        });
+        Response::mixin(new ResponseMixin);
+        Collection::mixin(new CollectionMixin);
     }
 }

@@ -17,6 +17,7 @@ class CompanyResource extends JsonResource
         return [
             'value' => $this->id,
             'text' => $this->name,
+            'tipo' => ($this->type) ? 'Compañias propias' : 'Compañias de terceros',
         ];
     }
 }
