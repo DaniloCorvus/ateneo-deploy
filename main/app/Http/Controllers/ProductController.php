@@ -97,7 +97,7 @@ class ProductController extends Controller
 
 
 
-
+/*
     public function index1()
     {
 
@@ -140,7 +140,7 @@ class ProductController extends Controller
 
 
     }
-
+*/
     /**
      * Show the form for creating a new resource.
      *
