@@ -84,6 +84,7 @@ use App\Http\Controllers\ClinicalHistoryController;
 use App\Http\Controllers\CountableIncomeController;
 use App\Http\Controllers\ElectronicPayrollController;
 use App\Http\Controllers\PayrollConfigController;
+use App\Http\Controllers\PayrollParametersController;
 use App\Http\Controllers\PayrollPaymentController;
 use Illuminate\Support\Facades\Hash;
 
@@ -411,8 +412,13 @@ Route::group(
 		/* END PAYROLL ROUTES */
 		Route::resource('deductions', 'DeductionController');
 
+	/**
+		 * PARAMETRIZACION NOMINA
+		 */
+		Route::get('params/payroll/overtimes/percentages', [PayrollOvertimeController::class, 'horasExtrasPorcentajes']);
+		Route::get('params/payroll/ssecurity_company/percentages/{id}', [PayrollParametersController::class, 'porcentajesSeguridadRiesgos']);
 
-
+		
 		Route::get("get-patient-fill/{id}", "PatientController@getPatientResend");
 		Route::get("type-service/formality/{id}", "TypeServiceController@allByFormality");
 		Route::get("opened-spaces", "SpaceController@index");

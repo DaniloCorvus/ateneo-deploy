@@ -20,6 +20,42 @@ class SubcategoryController extends Controller
     public function index()
     {
         //
+        $q = DB::table('Subcategoria as S')
+                ->leftJoin('Plan_Cuentas as CII','CII.Id_Plan_Cuentas','S.Cuenta_Ingreso_Id')
+                ->leftJoin('Plan_Cuentas as CI','CI.Id_Plan_Cuentas','S.Cuenta_Inventario_Id')
+                ->leftJoin('Plan_Cuentas as CG','CG.Id_Plan_Cuentas','S.Cuenta_Gasto_Id')
+                ->leftJoin('Plan_Cuentas as CCC','CCC.Id_Plan_Cuentas','S.Cuenta_Costo_Id')
+                ->leftJoin('Plan_Cuentas as CE','CE.Id_Plan_Cuentas','S.Cuenta_Entrada_Id')
+                ->leftJoin('Plan_Cuentas as CIV','CIV.Id_Plan_Cuentas','S.Cuenta_Iva_Venta_Id')
+                ->leftJoin('Plan_Cuentas as CIC','CIC.Id_Plan_Cuentas','S.Cuenta_Iva_Compra_Id')
+                ->leftJoin('Plan_Cuentas as CDV','CDV.Id_Plan_Cuentas','S.Cuenta_Descuento_Venta_Id')
+                ->leftJoin('Plan_Cuentas as CDC','CDC.Id_Plan_Cuentas','S.Cuenta_Descuento_Compra_Id')
+                ->leftJoin('Plan_Cuentas as CRV','CRV.Id_Plan_Cuentas','S.Cuenta_Retefuente_Venta_Id')
+                ->leftJoin('Plan_Cuentas as CRC','CRC.Id_Plan_Cuentas','S.Cuenta_Retefuente_Compra_Id')
+                ->leftJoin('Plan_Cuentas as CRIV','CRIV.Id_Plan_Cuentas','S.Cuenta_Reteica_Venta_Id')
+                ->leftJoin('Plan_Cuentas as CRIC','CRIC.Id_Plan_Cuentas','S.Cuenta_Reteica_Compra_Id')
+                ->leftJoin('Plan_Cuentas as CV','CV.Id_Plan_Cuentas','S.Cuenta_Reteiva_Venta_Id')
+                ->leftJoin('Plan_Cuentas as CC','CC.Id_Plan_Cuentas','S.Cuenta_Reteiva_Compra_Id')
+            ->select(
+                'S.*', 
+                'CII.Codigo as Cuenta_Ingreso',
+                'CI.Codigo as Cuenta_Inventario',
+                'CG.Codigo as Cuenta_Gasto',
+                'CCC.Codigo as Cuenta_Costo',
+                'CE.Codigo as Cuenta_Entrada',
+                'CIV.Codigo as Cuenta_Iva_Venta',
+                'CIC.Codigo as Cuenta_Iva_Compra',
+                'CDV.Codigo as Cuenta_Descuento_Venta',
+                'CDC.Codigo as Cuenta_Descuento_Compra',
+                'CRV.Codigo as Cuenta_Retefuente_Venta',
+                'CRC.Codigo as Cuenta_Retefuente_Compra',
+                'CRIV.Codigo as Cuenta_Reteica_Venta',
+                'CRIC.Codigo as Cuenta_Reteica_Compra',
+                'CV.Codigo as Cuenta_Reteiva_Venta',
+                'CC.Codigo as Cuenta_Reteiva_Compra',
+            );
+
+            return $this->success($q->get());
     }
 
     /**

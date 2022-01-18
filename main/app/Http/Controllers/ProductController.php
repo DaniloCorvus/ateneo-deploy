@@ -20,43 +20,60 @@ class ProductController extends Controller
     public function index()
     {
 
-    $data = DB::table('producto')
-    ->select([
-                                DB::raw('CONCAT(Principio_Activo, " ",Presentacion, " ",Concentracion, " (",Nombre_Comercial,") ",Cantidad," ",Unidad_Medida," EMB: ", Embalaje ) as Nombre'),
-                                'Id_Producto','Codigo_Cum',
-                                'Codigo_Cum as Cum',
-                                'Principio_Activo',
-                                'Descripcion_ATC',
-                                'Codigo_Barras',
-                                'Id_Producto',
-                                'Id_Categoria',
-                                'Id_Subcategoria',
-                                'Laboratorio_Generico as Generico',
-                                'Laboratorio_Comercial as Comercial',
-                                'Invima as Invima',
-                                'Imagen as Foto',
-                                'Nombre_Comercial as Nombre_Comercial',
-                                'Id_Producto',
-                                'Embalaje',
-                                'Tipo as Tipo',
-                                'Producto_Dotacion_Tipo',
-                                'Producto_Dotation_Type_Id',
-                                'Tipo_Catalogo',
-                                'pdt.name as nombreDotacionTipo',
-                                'Estado'
-                            ])
+        $tipoCatalogo = Request()->get('tipo');
 
-
-            ->leftJoin('product_dotation_types as pdt', 'pdt.id', '=', 'producto.Producto_Dotation_Type_Id');
-
+        $data = DB::table('Producto as p')->join('Subcategoria as s', 's.Id_Subcategoria', 'p.Id_Subcategoria')
+            ->join('Categoria_Nueva as c', 'c.Id_Categoria_Nueva', 's.Id_Categoria_Nueva')
+            ->select(
+                'p.Id_Producto',
+                'p.Codigo_Cum',
+                'p.Codigo_Cum as Cum',
+                'p.Principio_Activo',
+                'p.Descripcion_ATC',
+                'p.Codigo_Barras',
+                'p.Id_Producto',
+                'p.Id_Categoria',
+                'p.Id_Subcategoria',
+                'p.Laboratorio_Generico as Generico',
+                'p.Laboratorio_Comercial as Comercial',
+                'p.Invima as Invima',
+                'p.Imagen as Foto',
+                'p.Nombre_Comercial as Nombre_Comercial',
+                'p.Id_Producto',
+                'p.Embalaje',
+                'p.Tipo as Tipo',
+                'p.Tipo_Catalogo',
+                'p.Id_Tipo_Activo_Fijo',
+                'p.Estado',
+                'p.Referencia'
+            );
+        
+        /*  if ($tipoCatalogo == 'Medicamento' || $tipoCatalogo == 'Material' ) { */
+        # code...
+        $data->selectRaw('
+            CONCAT(
+                ifnull(p.Principio_Activo,""), " ",
+                ifnull(p.Presentacion,""), " ",
+                ifnull(p.Concentracion,""), " ",
+                ifnull(p.Nombre_Comercial,"")," ",
+                ifnull(p.Unidad_Medida,""), 
+                ifnull(p.Embalaje,"") 
+                ) as Nombre,
+                 
+                s.Nombre as Subcategoria,
+                c.Nombre as Categoria
+        
+                 ');
+        /*    } */
+        
+        
+        
         return $this->success(
-            $data->when(request()->get("tipo"), function ($q) {
-                $q->where("Tipo_Catalogo", request()->get("tipo"));
+            $data->when(request()->get("tipo"), function ($q, $fill) {
+                $q->where("p.Tipo_Catalogo", $fill);
             })
-
-        ->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
+                ->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
         );
-
 
 
     }
