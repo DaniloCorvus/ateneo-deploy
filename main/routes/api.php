@@ -236,6 +236,50 @@ Route::group(
 		Route::get('liquidado/{id}', [WorkContractController::class, 'getLiquidated']);
 
 
+
+        /** Rutas inventario dotacion rrhh */
+        /*
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+*/
+
+		Route::resource('dotations', 'DotationController');
+		Route::resource('product-dotation-types', 'ProductDotationTypeController');
+
+		Route::resource('inventary-dotation', 'InventaryDotationController');
+	    /** end*/
+
+
+
+		/** Rutas inventario dotacion rrhh */
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+
+		Route::get('/get-selected',  [InventaryDotationController::class, 'getSelected']);
+		Route::get('/get-total-inventary',  [InventaryDotationController::class, 'getTotatInventary']);
+		Route::get('/inventary-dotation-stock-epp',  [InventaryDotationController::class, 'getInventaryEpp']);
+		Route::post('/dotations-approve/{id}',  [DotationController::class, 'approve']);
+		Route::get('/dotations-list-product',  [DotationController::class, 'getListProductsDotation']);
+
+		Route::get('dotations/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'download']);
+		Route::get('downloadeliveries/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'downloadeliveries']);
+
+
+		/** end*/
+
+
+
+
+
+
+
+
 		/** Rutas actividades rrhh */
 		Route::resource('rrhh-activity-types', 'RrhhActivityTypeController');
 		Route::get('/rrhh-activity-people/{id}',  [RrhhActivityController::class, 'getPeople']);
@@ -268,18 +312,7 @@ Route::group(
 
 		Route::get("people-all", [PersonController::class, "getAll"]);
 
-		/** Rutas inventario dotacion rrhh */
-		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
-		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
-		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
-		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
-		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
-		/** end*/
 
-		Route::resource('dotations', 'DotationController');
-		Route::resource('product-dotation-types', 'ProductDotationTypeController');
-
-		Route::resource('inventary-dotation', 'InventaryDotationController');
 		Route::resource('disciplinary_process', 'DisciplinaryProcessController');
 
 		Route::get('/horarios/datos/generales/{semana}', [RotatingTurnHourController::class, 'getDatosGenerales']);

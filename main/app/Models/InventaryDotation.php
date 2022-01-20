@@ -19,4 +19,8 @@ class InventaryDotation extends Model
         'stock'
 
     ];
+
+    public function dotacionProducto(){
+        return $this->hasMany(DotationProduct::class);
+    }
 }
