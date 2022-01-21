@@ -269,7 +269,10 @@ class DotationController extends Controller
             return $this->success('guardado con éxito');
         } catch (\Throwable $th) {
             //throw $th;
-            return $this->success($th->getMessage(), 500);
+         //   return $this->success($th->getMessage(), 500, $th->getLine());
+
+            return  $this->errorResponse([$th->getMessage(), $th->getFile(), $th->getLine()]);
+
         }
     }
 
