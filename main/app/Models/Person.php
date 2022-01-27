@@ -167,6 +167,12 @@ class Person extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    
+    public function companyWorked()
+    {
+        return $this->belongsTo(Company::class,'company_worked_id');
+    }
+
 
     public function restriction()
     {

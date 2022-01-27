@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\VariableProduct;
 use Illuminate\Support\Facades\DB;
 
+
 class ProductController extends Controller
 {
     use ApiResponser;
@@ -47,7 +48,7 @@ class ProductController extends Controller
                 'p.Estado',
                 'p.Referencia'
             );
-        
+
         /*  if ($tipoCatalogo == 'Medicamento' || $tipoCatalogo == 'Material' ) { */
         # code...
         $data->selectRaw('
@@ -65,17 +66,18 @@ class ProductController extends Controller
         
                  ');
         /*    } */
-        
-        
-        
+
+
+
         return $this->success(
             $data->when(request()->get("tipo"), function ($q, $fill) {
                 $q->where("p.Tipo_Catalogo", $fill);
             })
+                ->when(request()->get("company_id"), function ($q, $fill) {
+                    $q->where("p.company_id", $fill);
+                })
                 ->paginate(request()->get('pageSize', 10), ['*'], 'page', request()->get('page', 1))
         );
-
-
     }
 
     /**
@@ -102,17 +104,14 @@ class ProductController extends Controller
             $dynamic = request()->get("dynamic");
             $product = Product::create($data);
             // echo json_encode($product);
-            foreach($dynamic as $d){
-				$d["product_id"] = $product->id;
-				VariableProduct::create($d);
-			}
+            foreach ($dynamic as $d) {
+                $d["product_id"] = $product->id;
+                VariableProduct::create($d);
+            }
 
             return $this->success("guardado con éxito");
-
-
         } catch (\Throwable $th) {
             return $this->error(['message' => $th->getMessage(), $th->getLine(), $th->getFile()], 400);
-
         }
     }
 
@@ -150,16 +149,15 @@ class ProductController extends Controller
         try {
             $data = $request->except(["dynamic"]);
             $dynamic = request()->get("dynamic");
-           // var_dump($dynamic);
+            // var_dump($dynamic);
             $product = Product::where('Id_Producto', $id)->update($data);
 
-            foreach($dynamic as $d){
+            foreach ($dynamic as $d) {
                 $d['product_id'] = $id;
-			    VariableProduct::updateOrCreate(['id' => $d["id"]], $d);
-			}
+                VariableProduct::updateOrCreate(['id' => $d["id"]], $d);
+            }
 
             return $this->success("guardado con éxito");
-
         } catch (\Throwable $th) {
             return $this->error(['message' => $th->getMessage(), $th->getLine(), $th->getFile()], 400);
         }

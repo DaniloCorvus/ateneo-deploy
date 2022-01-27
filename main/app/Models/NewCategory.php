@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class NewCategory extends Model
 {
-    protected $table = 'categoria_nueva';
+    protected $table = 'Categoria_Nueva';
 
 }

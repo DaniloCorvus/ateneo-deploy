@@ -528,6 +528,7 @@ Route::group(
 		Route::post('mycita', function () {
 			return response()->json(request()->all());
 		});
+		Route::post('change-company-work/{id}', [PersonController::class, 'changeCompanyWorked']);
 
 		//se ejecuta al crear
         Route::resource("subcategory", "SubcategoryController");
@@ -538,9 +539,13 @@ Route::group(
 
         //se ejecuta al editar
         Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
+
 		Route::resource("subcategory", "SubcategoryController");
         Route::resource("category", "CategoryController");
         
+
+        Route::resource("product-accounting", "ProductAccountingPlanController");
+
         Route::resource("product", "ProductController");
 	}
 );

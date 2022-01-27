@@ -1,0 +1,90 @@
+version: '3.7'
+
+services:
+  # PHP-FPM - Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: appAteneo
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+
+    volumes:
+      - ./:/var/www
+      - ./docker-files/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+
+    networks:
+      - app-network
+
+  # NGINX - Service
+  webserver:
+    image: nginx:alpine
+    container_name: webserverAteneo
+    restart: unless-stopped
+    tty: true
+
+    ports:
+      - "8100:80"
+      - "8143:443"
+
+    volumes:
+      - ./:/var/www
+      - ./docker-files/nginx/conf.d/:/etc/nginx/conf.d/
+
+    networks:
+      - app-network
+
+  # MariaDB - Service
+  db:
+    image: mariadb:10.5.6
+    container_name: dbAteneo
+    restart: unless-stopped
+    tty: true
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      MYSQL_DATABASE: ateneo_app
+      MYSQL_ROOT_PASSWORD: 123456
+
+    volumes:
+      - mariadbdata:/var/lib/mysql
+      - ./docker-files/mysql/my.cnf:/etc/mysql/my.cnf
+
+    networks:
+      - app-network
+#database admin service
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 9090:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+    networks:
+      - app-network
+
+  #adminer:
+  #  container_name: adminer
+  # image: adminer
+  # restart: always
+  # depends_on: 
+  #   - db
+  # ports:
+  #    - 9090:8080
+# Volumes
+volumes:
+  mariadbdata:
+    driver: local
+
+# Networks
+networks:
+  app-network:
+    driver: bridge

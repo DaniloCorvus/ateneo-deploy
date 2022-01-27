@@ -1,0 +1,1 @@
+<?php /**PATH /var/www/html/ateneo-deploy/main/resources/views/home.blade.php ENDPATH**/ ?>

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+use Illuminate\Support\Facades\Auth;
 class PersonController extends Controller
 {
     use ApiResponser;
@@ -624,5 +625,13 @@ class PersonController extends Controller
         } catch (\Throwable $th) {
             return $this->error($th->getMessage(), 400);
         }
+    }
+    public function changeCompanyWorked($companyId){
+      $person = Person::find( Auth()->user()->person_id);
+      $person->company_worked_id = $companyId;
+      $person->save();
+
+      return $this->success("success");
+
     }
 }
