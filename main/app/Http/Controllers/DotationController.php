@@ -327,6 +327,7 @@ class DotationController extends Controller
             $dotation = Dotation::find($id);
             $dotation->delivery_state = $request->get('state');
             $dotation->save();
+
             return $this->success('guardado con éxito');
         } catch (\Throwable $th) {
             return $this->success($th->getMessage(), 500);

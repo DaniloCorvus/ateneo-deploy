@@ -38,7 +38,7 @@ class InventaryDotationController extends Controller
         $page = $page ? $page : 1;
         $pageSize = Request()->get('pageSize');
         $pageSize = $pageSize ? $pageSize : 10;
-
+        /*
         $d = DB::table('inventary_dotations as ID')
             ->select('ID.stock', 'ID.code', 'ID.name', 'ID.size', 'ID.status', 'ID.type', 'ID.cost', 'ID.id')
             ->selectRaw('(SELECT IFNULL(SUM(quantity), 0)
@@ -46,10 +46,29 @@ class InventaryDotationController extends Controller
                             INNER JOIN dotations D ON D.id = DP.dotation_id
                             WHERE DP.inventary_dotation_id = ID.id
                             AND (D.delivery_state <> "Entregado" OR D.delivery_state <> "Anulado")) as cantidadA')
-
-            ->when(Request()->get('type'),  function ($q, $fill) {
-                $q->where('ID.type', $fill);
-            })
+*/
+        $d = DB::table('inventary_dotations as ID')
+            ->Leftjoin('Inventario_Nuevo AS inu', 'inu.Id_Producto', '=', 'ID.product_id')
+            ->Leftjoin('Costo_Promedio AS cp', 'cp.Id_Producto', '=', 'inu.Id_Producto')
+            // ->select('cp.Costo_Promedio', 'ID.stock', 'ID.code', 'ID.name', 'ID.size', 'ID.status', 'ID.type', 'ID.cost', 'ID.id')
+            ->select(
+                DB::raw(' IFNULL(inu.Cantidad, 0) as CantidadInventario'),
+                'cp.Costo_Promedio as cost',
+                'inu.Cantidad',
+                'inu.Cantidad_Apartada',
+                'inu.Cantidad_Seleccionada',
+                'ID.stock',
+                'ID.product_id',
+                'ID.code',
+                'ID.name',
+                'ID.size',
+                'ID.status',
+                'ID.type',
+                'ID.id'
+            )
+            ->where('Cantidad', '>', 0)
+            ->selectRaw('(SELECT IFNULL(SUM(Cantidad-(Cantidad_Apartada+Cantidad_Seleccionada)),0)
+                          FROM Inventario_Nuevo WHERE Id_Producto = ID.product_id ) as cantidadA')
 
             ->when(Request()->get('type'),  function ($q, $fill) {
                 $q->where('ID.type', $fill);
@@ -57,12 +76,16 @@ class InventaryDotationController extends Controller
             ->when(Request()->get('name'),  function ($q, $fill) {
                 $q->where('ID.name', 'like', '%' . $fill . '%');
             })
-
+/*
             ->when(Request()->get('entrega'),  function ($q, $fill) {
 
-                $q->havingRaw('ID.stock - cantidadA > 0');
+               // $q->havingRaw('ID.stock - cantidadA > 0');
+                $q->havingRaw('Cantidad > 0');
                 // $q->where('ID.type', $fill);
             })
+*/
+         //   ->where('inu.Cantidad', '>' )
+
 
             ->paginate($pageSize, '*', 'page', $page);
 
@@ -287,7 +310,6 @@ class InventaryDotationController extends Controller
             ->get();
 
         return $this->success(['month' => $d[0], 'year' => $dyear[0], 'td' => $td[0], 'te' => $te[0]]);
-
     }
 
     public function download($fechaInicio, $fechaFin, Request $req)
