@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InventaryDotation;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponser;
 use App\Models\Product;
@@ -18,6 +19,7 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
 
@@ -101,6 +103,7 @@ class ProductController extends Controller
         try {
 
             $data = $request->except(["dynamic"]);
+
             $dynamic = request()->get("dynamic");
             $product = Product::create($data);
             // echo json_encode($product);
@@ -108,6 +111,17 @@ class ProductController extends Controller
                 $d["product_id"] = $product->id;
                 VariableProduct::create($d);
             }
+
+            $data['product_id'] = $product->id;
+            $data['product_dotation_type_id'] = $data["Producto_Dotation_Type_Id"];
+            $data['name'] = $data["Nombre_Comercial"];
+            $data['code'] = $data["Codigo"];
+            $data['type'] = $data["Producto_Dotacion_Tipo"];
+            $data['status'] = $data["Status"];
+            $data['cost'] = 0;
+            $data['stock'] = 0;
+
+            $product = InventaryDotation::create($data);
 
             return $this->success("guardado con éxito");
         } catch (\Throwable $th) {
@@ -147,7 +161,7 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $data = $request->except(["dynamic"]);
+            $data = $request->except(["dynamic","Status","Codigo","Producto_Dotacion_Tipo"]);
             $dynamic = request()->get("dynamic");
             // var_dump($dynamic);
             $product = Product::where('Id_Producto', $id)->update($data);

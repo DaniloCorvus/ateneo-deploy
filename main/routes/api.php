@@ -7,6 +7,8 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArlController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CaracterizacionController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CountryController;
@@ -66,6 +68,33 @@ use App\Http\Controllers\TravelExpenseController;
 use App\Http\Controllers\TypeAppointmentController;
 use App\Http\Controllers\VisaTypeController;
 use App\Http\Controllers\WaitingListController;
+use App\Http\Controllers\SubcategoryController;
+use App\Models\Person;
+
+use App\Models\RegimenType;
+use App\Models\Level;
+use App\Models\Municipality;
+use App\Models\Department;
+
+use App\Models\Appointment;
+use App\Models\Agendamiento;
+use App\Models\Contract;
+use App\Models\Location;
+use App\Models\TypeDocument;
+use App\Models\Cup;
+use Illuminate\Support\Facades\Http;
+use App\Models\TypeAppointment;
+use App\Models\Space;
+use App\Models\Company;
+use App\Models\WaitingList;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+// use App\Models\Person;
+// use App\Models\CallIn;
+// use App\Models\SpaceT;
+// use App\Models\Usuario;
+
 use App\Http\Controllers\WorkContractController as CoreWorkContractController;
 use App\Http\Controllers\WorkContractTypeController;
 use App\Http\Controllers\ZonesController;
@@ -162,7 +191,7 @@ Route::group(
 		Route::get('parametrizacion/nomina/ssocial_funcionario', [PayrollConfigController::class, 'sSocialFuncionarioDatos']);
 
 
-		
+
 		/**/
 
 		Route::get('paginateRetentionType', [RetentionTypeController::class, 'paginate']);
@@ -208,6 +237,50 @@ Route::group(
 		Route::get('liquidado/{id}', [WorkContractController::class, 'getLiquidated']);
 
 
+
+        /** Rutas inventario dotacion rrhh */
+        /*
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+*/
+
+		Route::resource('dotations', 'DotationController');
+		Route::resource('product-dotation-types', 'ProductDotationTypeController');
+
+		Route::resource('inventary-dotation', 'InventaryDotationController');
+	    /** end*/
+
+
+
+		/** Rutas inventario dotacion rrhh */
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+
+		Route::get('/get-selected',  [InventaryDotationController::class, 'getSelected']);
+		Route::get('/get-total-inventary',  [InventaryDotationController::class, 'getTotatInventary']);
+		Route::get('/inventary-dotation-stock-epp',  [InventaryDotationController::class, 'getInventaryEpp']);
+		Route::post('/dotations-approve/{id}',  [DotationController::class, 'approve']);
+		Route::get('/dotations-list-product',  [DotationController::class, 'getListProductsDotation']);
+
+		Route::get('dotations/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'download']);
+		Route::get('downloadeliveries/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'downloadeliveries']);
+
+
+		/** end*/
+
+
+
+
+
+
+
+
 		/** Rutas actividades rrhh */
 		Route::resource('rrhh-activity-types', 'RrhhActivityTypeController');
 		Route::get('/rrhh-activity-people/{id}',  [RrhhActivityController::class, 'getPeople']);
@@ -240,18 +313,7 @@ Route::group(
 
 		Route::get("people-all", [PersonController::class, "getAll"]);
 
-		/** Rutas inventario dotacion rrhh */
-		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
-		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
-		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
-		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
-		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
-		/** end*/
 
-		Route::resource('dotations', 'DotationController');
-		Route::resource('product-dotation-types', 'ProductDotationTypeController');
-
-		Route::resource('inventary-dotation', 'InventaryDotationController');
 		Route::resource('disciplinary_process', 'DisciplinaryProcessController');
 
 		Route::get('/horarios/datos/generales/{semana}', [RotatingTurnHourController::class, 'getDatosGenerales']);
@@ -403,7 +465,7 @@ Route::group(
 		Route::post('payroll/pay', [PayrollController::class, 'store']);
 		Route::post('payroll/report-electronic/{id}/{idPersonPayroll?}', [PayrollController::class, 'reportDian']);
 
-		
+
 		Route::get('/company-global', [CompanyController::class, 'getGlobal']);
 
 
@@ -491,6 +553,50 @@ Route::group(
 		Route::resource("type-locations", "TypeLocationController");
 		Route::resource("menus", "MenuController");
 		Route::resource("fees", "FeeController");
+
+
+        //se ejecuta al crear
+        Route::resource("subcategory", "SubcategoryController");
+		Route::post("subcategory-variable/{id}", "SubcategoryController@deleteVariable");
+
+        //se ejecuta al crear
+        Route::get("subcategory-field/{id}", "SubcategoryController@getField");
+
+        //se ejecuta al editar
+        Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
+		Route::resource("subcategory", "SubcategoryController");
+        Route::resource("category", "CategoryController");
+
+        Route::resource("product", "ProductController");
+
+
+        Route::resource("catalogo", "CatalogoController");
+
+
+        /** Rutas inventario dotacion rrhh */
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::get('/get-selected',  [InventaryDotationController::class, 'getSelected']);
+		Route::get('/get-total-inventary',  [InventaryDotationController::class, 'getTotatInventary']);
+		Route::get('/inventary-dotation-stock-epp',  [InventaryDotationController::class, 'getInventaryEpp']);
+
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+
+		Route::get('/dotations-type',  [DotationController::class, 'getDotationType']);
+
+		Route::post('/dotations-approve/{id}',  [DotationController::class, 'approve']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+		Route::get('/dotations-list-product',  [DotationController::class, 'getListProductsDotation']);
+
+		Route::get('dotations/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'download']);
+		Route::get('downloadeliveries/download/{inicio?}/{fin?}', [InventaryDotationController::class, 'downloadeliveries']);
+
+
+		/** end*/
+
+
+
 		Route::resource("reasons", "ReasonController");
 		Route::resource("method-pays", "MethodPayController");
 		Route::resource("banks", "BanksController");
