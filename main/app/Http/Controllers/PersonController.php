@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 use Illuminate\Support\Facades\Auth;
+
 class PersonController extends Controller
 {
     use ApiResponser;
@@ -68,19 +69,19 @@ class PersonController extends Controller
      */
 
 
-	public function liquidateOrActivate(Request $request, $id)
-	{
-		try {
-		    
-			$person = Person::find($id);
-			$person->status = $request->status;
-			$person->saveOrFail();
-			
-			return $this->success($person);
-		} catch (\Throwable $th) {
-			return $this->error($th->getMessage(), 500);
-		}
-	}
+    public function liquidateOrActivate(Request $request, $id)
+    {
+        try {
+
+            $person = Person::find($id);
+            $person->status = $request->status;
+            $person->saveOrFail();
+
+            return $this->success($person);
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage(), 500);
+        }
+    }
 
 
 
@@ -626,12 +627,40 @@ class PersonController extends Controller
             return $this->error($th->getMessage(), 400);
         }
     }
-    public function changeCompanyWorked($companyId){
-      $person = Person::find( Auth()->user()->person_id);
-      $person->company_worked_id = $companyId;
-      $person->save();
+    public function changeCompanyWorked($companyId)
+    {
+        $person = Person::find(Auth()->user()->person_id);
+        $person->company_worked_id = $companyId;
+        $person->save();
 
-      return $this->success("success");
+        return $this->success("success");
+    }
 
+    public function setCompaniesWork($personId, Request $req)
+    {
+        try {
+            $companies = $req->get('companies');
+          
+            DB::table('company_person')->where('person_id', '=', $personId)->delete();
+
+            $person = Person::find($personId);
+            $person->company_worked_id = $companies[0];
+            $person->save();
+            
+            foreach ($companies as $ids) {
+                DB::insert('insert into company_person (company_id, person_id) values (?, ?)', [$ids, $personId]);
+            }
+
+            return $this->success('Guardado correctamente');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->errorResponse($th->getMessage());
+        }
+    }
+
+    public function personCompanies($personId)
+    {
+        $companies = DB::table('company_person')->where('person_id',$personId)->get('*');
+        return $this->success($companies);
     }
 }

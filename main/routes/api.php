@@ -635,6 +635,8 @@ Route::group(
 			return response()->json(request()->all());
 		});
 		Route::post('change-company-work/{id}', [PersonController::class, 'changeCompanyWorked']);
+		Route::post('person/set-companies/{personId}', [PersonController::class, 'setCompaniesWork']);
+		Route::get('person/get-companies/{personId}', [PersonController::class, 'personCompanies']);
 
 		//se ejecuta al crear
         Route::resource("subcategory", "SubcategoryController");
