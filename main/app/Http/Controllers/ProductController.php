@@ -51,6 +51,7 @@ class ProductController extends Controller
                 'p.Referencia'
             );
 
+
         /*  if ($tipoCatalogo == 'Medicamento' || $tipoCatalogo == 'Material' ) { */
         # code...
         $data->selectRaw('
@@ -59,13 +60,13 @@ class ProductController extends Controller
                 ifnull(p.Presentacion,""), " ",
                 ifnull(p.Concentracion,""), " ",
                 ifnull(p.Nombre_Comercial,"")," ",
-                ifnull(p.Unidad_Medida,""), 
-                ifnull(p.Embalaje,"") 
+                ifnull(p.Unidad_Medida,""),
+                ifnull(p.Embalaje,"")
                 ) as Nombre,
-                 
+
                 s.Nombre as Subcategoria,
                 c.Nombre as Categoria
-        
+
                  ');
         /*    } */
 
