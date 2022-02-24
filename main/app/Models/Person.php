@@ -55,6 +55,7 @@ class Person extends Model
         "municipality_id",
         "medical_record",
          'arl_id',
+         'company_worked_id',
         // "ips"
 
         // contract: '';

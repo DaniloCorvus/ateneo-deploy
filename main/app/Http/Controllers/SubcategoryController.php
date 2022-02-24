@@ -17,7 +17,7 @@ class SubcategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $req)
     {
         //
         $q = DB::table('Subcategoria as S')
@@ -53,7 +53,9 @@ class SubcategoryController extends Controller
                 'CRIC.Codigo as Cuenta_Reteica_Compra',
                 'CV.Codigo as Cuenta_Reteiva_Venta',
                 'CC.Codigo as Cuenta_Reteiva_Compra',
-            );
+            )->when($req->get('company_id'),function($q,$fill){
+                $q->where('S.company_id',$fill);
+            });
 
             return $this->success($q->get());
     }

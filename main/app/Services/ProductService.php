@@ -47,6 +47,7 @@ class ProductService
                     ) as name
                      ')
                 ->where('Tipo_Catalogo',$tipoCatalogo)
+                ->where('p.Company_Id',$companyId)
             ->paginate( Request()->get('pageSize', 10), ['*'], 'page', Request()->get('page', 1));
     }
 }

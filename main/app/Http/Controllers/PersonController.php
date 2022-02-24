@@ -404,7 +404,8 @@ class PersonController extends Controller
             $personData["image"]  =  $infoImg['image'];
 
             $personData["personId"] = null;
-
+            $personData["company_worked_id"] = $personData['workContract']['company_id'];
+           // return $personData;
             $per = $person = Person::create($personData);
             $contractData = $personData["workContract"];
             $contractData["person_id"] = $person->id;
