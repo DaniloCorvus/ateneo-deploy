@@ -643,7 +643,8 @@ Route::group(
         Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
 		Route::resource("subcategory", "SubcategoryController");
         Route::resource("category", "CategoryController");
-
+		
+		Route::resource("product-accounting", "ProductAccountingPlanController");
         Route::resource("product", "ProductController");
 	}
 );
