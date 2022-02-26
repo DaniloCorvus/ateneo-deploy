@@ -135,7 +135,7 @@ class ManagmentAppointmentCreation
                     'Globo' => ($this->response != 'No migrado' && $this->response != 'null' && $this->response != null) ? $this->response->json() : 'No migrado'
                 ]);
 
-                $this->sendAppointmentCreatedNotification->handleMail($this->appointment, $this->space,  $this->data, $this->another);
+                // $this->sendAppointmentCreatedNotification->handleMail($this->appointment, $this->space,  $this->data, $this->another);
             }
 
             return [

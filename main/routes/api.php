@@ -116,6 +116,9 @@ use App\Http\Controllers\PayrollConfigController;
 use App\Http\Controllers\PayrollPaymentController;
 use Illuminate\Support\Facades\Hash;
 
+use App\Http\Controllers\PayrollParametersController;
+use App\Http\Controllers\RCuentaMedicaController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -126,6 +129,13 @@ use Illuminate\Support\Facades\Hash;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+//Dan Radication Routes
+Route::get('get-company', [CompanyController::class, 'getCompanyByIdentifier']);
+Route::post('save-radicacion', [RCuentaMedicaController::class, 'store']);
+Route::get('get-companies', [CompanyController::class, 'getCompanies']);
+//End Radicatioon routes
+
 
 Route::post('/asistencia/validar', [AsistenciaController::class, 'validar']);
 Route::get('/', function () {
@@ -164,6 +174,8 @@ Route::group(
 		 */
 
 		Route::post("presentianCall", "CallInController@presentialCall");
+		Route::post("get-call-by-identifier", "CallInController@getCallByIdentifier");
+		Route::resource("r-cuentas", 'RCuentaMedicaController');
 
 
 		Route::get('paginateContractType', [WorkContractTypeController::class, 'paginate']);
@@ -312,7 +324,18 @@ Route::group(
 
 		Route::get("people-all", [PersonController::class, "getAll"]);
 
+		/** Rutas inventario dotacion rrhh */
+		Route::get('/inventary-dotation-by-category',  [InventaryDotationController::class, 'indexGruopByCategory']);
+		Route::get('/inventary-dotation-statistics',  [InventaryDotationController::class, 'statistics']);
+		Route::get('/inventary-dotation-stock',  [InventaryDotationController::class, 'getInventary']);
+		Route::post('/dotations-update/{id}',  [DotationController::class, 'update']);
+		Route::get('/dotations-total-types',  [DotationController::class, 'getTotatlByTypes']);
+		/** end*/
 
+		Route::resource('dotations', 'DotationController');
+		Route::resource('product-dotation-types', 'ProductDotationTypeController');
+
+		Route::resource('inventary-dotation', 'InventaryDotationController');
 		Route::resource('disciplinary_process', 'DisciplinaryProcessController');
 
 		Route::get('/horarios/datos/generales/{semana}', [RotatingTurnHourController::class, 'getDatosGenerales']);
@@ -473,6 +496,11 @@ Route::group(
 		/* END PAYROLL ROUTES */
 		Route::resource('deductions', 'DeductionController');
 
+		/**
+		 * PARAMETRIZACION NOMINA
+		 */
+		/* Route::get('params/payroll/overtimes/percentages', [PayrollOvertimeController::class, 'horasExtrasPorcentajes']); */
+		Route::get('params/payroll/ssecurity_company/percentages/{id}', [PayrollParametersController::class, 'porcentajesSeguridadRiesgos']);
 
 
 		Route::get("get-patient-fill/{id}", "PatientController@getPatientResend");
@@ -601,7 +629,9 @@ Route::group(
 		Route::get('paginatePaymentMethod', [PaymentMethodController::class, 'paginate']);
 
 		Route::get('type_reportes', [ReporteController::class, 'getReportes']);
-		Route::get('info-grafical-resume', [ReporteController::class, 'getDataByGrafical']);
+		Route::get('info-grafical-by-regional', [ReporteController::class, 'getDataByRegional']);
+		Route::get('info-grafical-by-formality', [ReporteController::class, 'getDataByFormality']);
+		Route::get('info-grafical-by-deparment', [ReporteController::class, 'getDataByDepartment']);
 
 
 		//Price List
@@ -633,19 +663,19 @@ Route::group(
 		Route::get('person/get-companies/{personId}', [PersonController::class, 'personCompanies']);
 
 		//se ejecuta al crear
-        Route::resource("subcategory", "SubcategoryController");
+		Route::resource("subcategory", "SubcategoryController");
 		Route::post("subcategory-variable/{id}", "SubcategoryController@deleteVariable");
 
-        //se ejecuta al crear
-        Route::get("subcategory-field/{id}", "SubcategoryController@getField");
+		//se ejecuta al crear
+		Route::get("subcategory-field/{id}", "SubcategoryController@getField");
 
-        //se ejecuta al editar
-        Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
+		//se ejecuta al editar
+		Route::get("subcategory-edit/{id?}/{idSubcategoria}", "SubcategoryController@getFieldEdit");
 		Route::resource("subcategory", "SubcategoryController");
         Route::resource("category", "CategoryController");
-		
 		Route::resource("product-accounting", "ProductAccountingPlanController");
-        Route::resource("product", "ProductController");
+       
+		Route::resource("product", "ProductController");
 	}
 );
 
