@@ -120,4 +120,19 @@ class CallInController extends Controller
             return $this->success($th->getMessage(), 400);
         }
     }
+
+
+    public  function getCallByIdentifier(Request $request)
+    {
+        try {
+
+            $calls = CallIn::with('usuario.person')
+            ->where('Identificacion_Paciente', request()->get('identifier'))
+            // ->where('Id_Llamada', '<>', '')            
+            ->paginate(50);
+            return  response()->success($calls);
+        } catch (\Throwable $th) {
+            return $this->success($th->getMessage(), 400);
+        }
+    }
 }

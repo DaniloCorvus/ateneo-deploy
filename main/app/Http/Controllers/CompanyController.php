@@ -190,5 +190,27 @@ class CompanyController extends Controller
             'transportation_assistance', 'base_salary', 'law_1607'
         ]);
     }
-    
+
+
+    public function getCompanyByIdentifier()
+    {
+        $company = Company::select('name')->firstWhere('tin', request()->get('identifier'));
+
+        $exist = false;
+        $name = null;
+
+        if ($company) {
+            $name = $company->name;
+            $exist = true;
+        }
+
+        return response()->success(['name' => $name, 'existe' => $exist]);
+    }
+
+
+    public function getCompanies()
+    {
+        $companies = Company::query();
+        return $this->success(CompanyResource::collection($companies->where('type', 1)->get()));
+    }
 }

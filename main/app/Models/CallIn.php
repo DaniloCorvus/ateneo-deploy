@@ -26,6 +26,10 @@ class CallIn extends Model
         return $this->belongsTo(Patient::class,'Identificacion_Paciente','identifier');
     }
     
+    public function usuario(){
+        return $this->belongsTo(Usuario::class,'Identificacion_Agente','usuario');
+    }
+    
     public function formality(){
         return $this->belongsTo(Formality::class,'Tipo_Tramite');
     }

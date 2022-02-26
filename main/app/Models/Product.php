@@ -60,6 +60,7 @@ class Product extends Model
         'Tipo_Catalogo',
         'Orden_Compra',
         'Producto_Dotation_Type_Id',
+        'Producto_Dotacion_Tipo',
         'CantUnMinDis',
         'Id_Tipo_Activo_Fijo',
         'Orden_Compra'

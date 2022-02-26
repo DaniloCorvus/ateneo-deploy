@@ -3,25 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agendamiento;
+use App\Http\Resources\AgendmientoResource;
+use App\Models\Appointment;
 use App\Models\Person;
+use App\Services\SpaceService;
 use App\Models\Space;
+use App\HistoryAppointment;
 use App\HistoryAgendamiento;
 use App\Holiday;
 use App\Models\TypeAppointment;
 use App\Repositories\AgendamientoRepository;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\SubTypeAppointment;
-
-use App\Http\Resources\AgendmientoResource;
-use App\Models\Appointment;
-use App\Services\SpaceService;
-use App\HistoryAppointment;
-use Carbon\CarbonImmutable;
 
 class AgendamientoController extends Controller
 {
@@ -186,12 +185,7 @@ class AgendamientoController extends Controller
                             WHEN state = "Cancelado" THEN "Espacio Cancelado"
                             WHEN status = 0 THEN "Espacio Agendado"
                             WHEN status = 1 THEN "Espacio Disponible"
-<<<<<<< HEAD
-
-                        END
-=======
                         END, type)
->>>>>>> cad4ec93f5b5bac9371b86520ae0a632e88ced6e
                         AS title
                         '),
                 ])

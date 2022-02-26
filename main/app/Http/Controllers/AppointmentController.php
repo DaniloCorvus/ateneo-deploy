@@ -12,9 +12,9 @@ use App\Repositories\AppointmentRepository;
 use App\Services\GlobhoService;
 
 // include($_SERVER['DOCUMENT_ROOT'] .  DIRECTORY_SEPARATOR . '../elibom' . DIRECTORY_SEPARATOR . 'src/elibom_client.php');
-include($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'main'  . DIRECTORY_SEPARATOR . 'elibom' . DIRECTORY_SEPARATOR . 'src/elibom_client.php');
+// include($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'main'  . DIRECTORY_SEPARATOR . 'elibom' . DIRECTORY_SEPARATOR . 'src/elibom_client.php');
 
-use Elibom\APIClient\ElibomClient as ElibomClient;
+// use Elibom\APIClient\ElibomClient as ElibomClient;
 use Illuminate\Database\Query\Builder;
 
 class AppointmentController extends Controller

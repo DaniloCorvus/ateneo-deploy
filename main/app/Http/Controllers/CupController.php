@@ -38,19 +38,19 @@ class CupController extends Controller
     {
         $cups = Cup::query();
 
-        $cups->when(request()->get('search'), function ($q) {
+        $cups->when(request()->get('year'), function ($q) {
+            $q->where('year', request()->get('year'))->get();
+        });
+
+        $cups->when((request()->get('speciality')), function ($q) {
+            $cupIds = DB::table('cup_speciality')->select('cup_id')->where('speciality_id', request()->get('speciality'));
             $q->where(function ($q) {
                 $q->where('description', 'Like', '%' . request()->get('search') . '%')
                     ->orWhere('code', 'Like', '%' . request()->get('search') . '%');
-            });
-        });
-
-        $cups->when(request()->get('speciality'), function ($q) {
-            $q->where('speciality', request()->get('speciality'))->get();
-        });
-
-        $cups->when(request()->get('year'), function ($q) {
-            $q->where('year', request()->get('year'))->get();
+            })
+                ->where(function ($q) use ($cupIds) {
+                    $q->orWhereIn('id', $cupIds->pluck('cup_id'));
+                });
         });
 
         $cups->when(request()->get('space'), function ($q, $spaceId) {
@@ -66,7 +66,12 @@ class CupController extends Controller
                 });
         });
 
-
+        $cups->when(request()->get('search'), function ($q) {
+            $q->where(function ($q) {
+                $q->where('description', 'Like', '%' . request()->get('search') . '%')
+                    ->orWhere('code', 'Like', '%' . request()->get('search') . '%');
+            });
+        });
 
         return $this->success($cups->get(['id as value',  DB::raw("CONCAT( code, ' - ' ,description) as text")])->take(30));
     }

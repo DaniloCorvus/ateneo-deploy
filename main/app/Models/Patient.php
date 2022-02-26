@@ -96,7 +96,12 @@ class Patient extends Model
         'type_document_id',
         'regimen_id',
         'contract_id',
-        'optional_phone'
+        'optional_phone',
+        'query_history'
+    ];
+
+    protected $casts = [
+        'query_history' => 'array',
     ];
 
     public function eps()
